@@ -27,11 +27,11 @@ int flow_demo_c(ClientData clientData, Tcl_Interp *interp, int argc,
   nr = atoi(argv[1]);
 
   fpp = fopen_rp(
-      "parameters/sequence.par"); // replaced fopen_r, ad holten 12-2012
+      "parameters/sequence.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
   for (i = 0; i < 4; i++)
-    fscanf(fpp, "%s\n", seq_name[i]); /* name of sequence */
+    fscanf(fpp, "%255s\n", seq_name[i]); /* name of sequence */
   fscanf(fpp, "%d\n", &seq_first);
   fscanf(fpp, "%d\n", &seq_last);
   fclose(fpp);

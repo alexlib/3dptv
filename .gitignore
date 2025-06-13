@@ -8,3 +8,5 @@ ipch/
 *.ilk
 *.pdb
 build/
+.clang-format
+.vscode/c_cpp_properties.json

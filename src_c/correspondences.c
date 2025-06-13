@@ -75,7 +75,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
       tim[j][i] = 0;
   }
 
-  /* ------- if only one cam and 2D ------- */ // by Beat Lüthi June 2007
+  /* ------- if only one cam and 2D ------- */ // by Beat Lï¿½thi June 2007
   if (n_img == 1) {
     if (res_name[0] == 0)
       sprintf(res_name, "rt_is");
@@ -409,7 +409,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
     for (j = 0; j < n_img; j++)
       if (con[i].p[j] > -1) { // Bug, detected in Nov 2011 by Koni&Beat
         p1 = geo[j][con[i].p[j]].pnr;
-        if (p1 > -1 && p1 < 1202590843)
+        if (p1 > -1 && p1 < num[j])
           pix[j][p1].tnr = i;
       }
 

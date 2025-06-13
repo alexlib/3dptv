@@ -1091,10 +1091,10 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
         snprintf(res_name, sizeof(filename), "res/db_is.%s_%1d", seq_ch,
                  chfield);
     }
-    sprintf(buf, "\nImages:");
+    snprintf(buf, sizeof(buf), "\n Images:");
     for (j = 0; j < n_img; j++) {
       char temp_buf[sizeof(buf)];
-      snprintf(temp_buf, sizeof(temp_buf), "%s  %s", buf, img_name[j]);
+	snprintf(temp_buf, sizeof(temp_buf), "%s  %s", buf, img_name[j]);
       strncpy(buf, temp_buf, sizeof(buf) - 1);
       buf[sizeof(buf) - 1] = '\0';
     }
