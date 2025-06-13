@@ -60,6 +60,7 @@ source_group("Tcl Files" FILES ${ptv_tcl})
 
 add_executable(${TARGET_NAME} ${ptv_srcs} ${ptv_hdrs} ${ptv_tcl} )
 target_compile_definitions(${TARGET_NAME} PRIVATE _SVID_SOURCE)
+add_compile_definitions(_DEFAULT_SOURCE)
 
 if(WIN32)
   set_target_properties(${TARGET_NAME} PROPERTIES LINKER_LANGUAGE C)  
