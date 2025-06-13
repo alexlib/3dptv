@@ -34,6 +34,8 @@ void checkpoint_proc(Tcl_Interp *interp) {
 
   puts("check points");
 
+  char buf[256];
+
   for (i = 0; i < n_img; i++) {
     // read_ori (&Ex[i], &I[i], img_ori[i]);		// bug repaired, ad holten,
     // 12-2012

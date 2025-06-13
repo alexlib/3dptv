@@ -8,7 +8,7 @@ int mouse_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   double x, y, xa, ya;
   double xa12, xb12, ya12, yb12;
   int k, pt1, intx1, inty1, count, intx2, inty2, pt2;
-  candidate cand[maxcand];
+  candidate cand[MAXCAND];
   Tk_PhotoHandle img_handle;
   Tk_PhotoImageBlock img_block;
 

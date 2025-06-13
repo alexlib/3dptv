@@ -1,6 +1,6 @@
 #define sqr(x) x*x
-#define maxcand 200 //Beat changed it on 090325
-#define maxtrack 64 //Beat changed it on 090325
+#define MAXCAND 200 //Beat changed it on 090325
+#define MAXTRACK 64 //Beat changed it on 090325
 
 #define M 20000 //Beat changed it on 090325
 
@@ -138,9 +138,9 @@ typedef struct
 {
   int    	p1;	       	/* point number of master point */
   int    	n;	       	/* # of candidates */
-  int    	p2[maxcand];	/* point numbers of candidates */
-  double	corr[maxcand];	/* feature based correlation coefficient */
-  double	dist[maxcand];	/* distance perpendicular to epipolar line */
+  int    	p2[MAXCAND];	/* point numbers of candidates */
+  double	corr[MAXCAND];	/* feature based correlation coefficient */
+  double	dist[MAXCAND];	/* distance perpendicular to epipolar line */
 }
 correspond;	       	/* correspondence candidates */
 
@@ -162,8 +162,8 @@ foundpix;
 
 typedef struct
 {
-  int multi, h[maxtrack], freq[maxtrack];
-  double quali[maxtrack];
+  int multi, h[MAXTRACK], freq[MAXTRACK];
+  double quali[MAXTRACK];
 }
 currlist;
 
@@ -177,8 +177,8 @@ vector;
 
 typedef struct
 {
-  int z1, c[maxcand], n[maxcand];
-  double quali[maxcand];
+  int z1, c[MAXCAND], n[MAXCAND];
+  double quali[MAXCAND];
 }
 prevlist;
 

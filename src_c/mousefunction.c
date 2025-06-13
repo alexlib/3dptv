@@ -11,10 +11,12 @@ int mouse_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   double x, y, xa, ya;
   double xa12, xb12, ya12, yb12;
   int k, pt1, intx1, inty1, count, intx2, inty2, pt2;
-  candidate cand[maxcand];
+  candidate cand[MAXCAND];
   Tk_PhotoHandle img_handle;
   Tk_PhotoImageBlock img_block;
   Zoompar zoompar;
+  char val[256];
+  char buf[256];
 
   // if (zoom_f[0] == 1) {zf = 2;} else { zf = zoom_f[0];}		// commented
   // out, ad holten, 04-2013
@@ -55,15 +57,14 @@ int mouse_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       metric_to_pixel(xa, ya, imx, imy, pix_x, pix_y, &xa, &ya, chfield);
 
       /* pan to this position */
-      sprintf(val, "panimage %d %f %f", i + 1, xa / imx, ya / imy);
+      snprintf(val, sizeof(val), "panimage %d %f %f", i + 1, xa / imx, ya / imy);
       Tcl_Eval(interp, val);
     }
     break;
 
   case 5: /* measure coordinates and grey value */
     // x = (float) (click_x - imx/2)/zoom_f[n] + zoom_x[n];		removed, ad holten
-    // 03-2013 y = (float) (click_y - imy/2)/zoom_f[n] + zoom_y[n];
-    sprintf(buf, "   %6.2f    %6.2f    %s", (double)click_x, (double)click_y,
+    snprintf(buf, sizeof(buf), "   %6.2f    %6.2f    %s", (double)click_x, (double)click_y,
             argv[5]);
     puts(buf);
     Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);

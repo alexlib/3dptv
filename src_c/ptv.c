@@ -146,7 +146,7 @@ void read_ascii_data(int filenumber) {
     nt4[3][i] = 0;
     compose_name_plus_nr_str(seq_name[i], "_targets", filenumber, filein);
 
-    FILEIN = fopen_rp(filein); // replaced fopen(), ad holten 12-2012
+    FILEIN = fopen_rp(filein);  // replaced fopen(), ad holten 12-2012
     if (FILEIN) {
       fscanf(FILEIN, "%d\n", &nt4[3][i]);
       for (j = 0; j < nt4[3][i]; j++) {
@@ -170,7 +170,7 @@ void read_targets(int i_img, int filenumber, int *num) {
   /* read targets of each camera */
   nt4[3][i_img] = 0;
 
-  FILEIN = fopen_rp(filein); // replaced fopen(), ad holten 12-2012
+  FILEIN = fopen_rp(filein);  // replaced fopen(), ad holten 12-2012
   if (FILEIN) {
     fscanf(FILEIN, "%d\n", &nt4[3][i_img]);
     for (j = 0; j < nt4[3][i_img]; j++) {
@@ -1015,5 +1015,37 @@ void neighbours(float seekx[], float radi[], int nliste[], int *innliste,
             printf("More Points found than can be supported! Reduce search "
                    "area or increase POSI\n");
         }
+  }
+}
+/**
+ * @brief Writes the specified targets to the output destination.
+ *
+ * This function processes the provided targets and writes them to the
+ * appropriate output, which could be a file, stream, or other destination.
+ *
+ * @param targets A collection or list of targets to be written.
+ * @param count The number of targets in the collection.
+ * @return int Returns 0 on success, or a negative error code on failure.
+ */
+void write_targets(int n_img, char **img_name, int *num, target **pix) {
+  int i_img, i;
+  char filename[256];
+  FILE *fp1;
+
+  for (i_img = 0; i_img < n_img; i_img++) {
+    snprintf(filename, sizeof(filename), "%s_targets", img_name[i_img]);
+    fp1 = fopen(filename, "w");
+    if (!fp1) {
+      printf("Can't open ascii file: %s\n", filename);
+      continue;
+    }
+    fprintf(fp1, "%d\n", num[i_img]);
+    for (i = 0; i < num[i_img]; i++) {
+      fprintf(fp1, "%4d %9.4f %9.4f %5d %5d %5d %5d %5d\n", pix[i_img][i].pnr,
+              pix[i_img][i].x, pix[i_img][i].y, pix[i_img][i].n,
+              pix[i_img][i].nx, pix[i_img][i].ny, pix[i_img][i].sumg,
+              pix[i_img][i].tnr);
+    }
+    fclose(fp1);
   }
 }

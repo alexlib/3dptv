@@ -21,7 +21,7 @@ See the file license.txt for copying permission.
 
 #include "ptv.h"
 
-/* #define maxcand 100 */
+/* #define MAXCAND 100 */
 
 /****************************************************************************/
 /*--------------- 4 camera model: consistent quadruplets -------------------*/
@@ -33,10 +33,11 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   int p1, p2, p3, p4, p31, p41, p42, pt1;
   int tim[4][nmax], intx, inty;
   double xa12, ya12, xb12, yb12, X, Y, Z, corr;
-  candidate cand[maxcand];
+  candidate cand[MAXCAND];
   n_tupel *con0;
   correspond *list[4][4];
   Zoompar zoompar[4];
+  char buf[256];
   /* ----------------------------------------------------------------------- */
 
   /* allocate memory for lists of correspondences */
@@ -51,7 +52,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   printf("in corres zmin0: %f, zmax0: %f\n", Zmin_lay[0], Zmax_lay[0]);
 
   /*	initialize ...	*/
-  sprintf(buf, "Establishing correspondences");
+  snprintf(buf, sizeof(buf), "Establishing correspondences");
   Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
   Tcl_Eval(interp, ".text delete 2");
   Tcl_Eval(interp, ".text insert 2 $tbuf");
@@ -123,8 +124,8 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
 
           /* write all corresponding candidates to the preliminary list */
           /* of correspondences */
-          if (count > maxcand)
-            count = maxcand;
+          if (count > MAXCAND)
+            count = MAXCAND;
           for (j = 0; j < count; j++) {
             list[i1][i2][p1].p2[j] = cand[j].pnr;
             list[i1][i2][p1].corr[j] = cand[j].corr;
@@ -481,7 +482,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
 
   free(con0);
 
-  sprintf(buf, "Correspondences done");
+  snprintf(buf, sizeof(buf), "Correspondences done");
   Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
   Tcl_Eval(interp, ".text delete 2");
   Tcl_Eval(interp, ".text insert 2 $tbuf");

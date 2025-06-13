@@ -95,7 +95,8 @@ int read_image(Tcl_Interp *interp, char path[128], unsigned char *img) {
   Tk_PhotoImageBlock img_block;
 
   if (tiff_flag) {
-    sprintf(val, "temp read %s", path);
+    char val[256];
+    snprintf(val, sizeof(val), "temp read %s", path);
     Tcl_Eval(interp, val);
 
     img_handle = Tk_FindPhoto(interp, "temp");

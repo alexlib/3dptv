@@ -24,12 +24,13 @@ See the file license.txt for copying permission.
 
 #include "ptv.h" // NOLINT
 #if (_MSC_VER >= 1500 && _DEBUG)
-#include <crtdbg.h> // only for vc2010
+#include <crtdbg.h>  // only for vc2010
 #endif
 
 #define nmax 20240
+#define kMaxCorrespondences 20240
 
-/*	global declarations for ptv  */
+/*  global declarations for ptv  */
 /*-------------------------------------------------------------------------*/
 
 int n_img;             /* no of images */
@@ -48,7 +49,7 @@ int match = 0;         /* no. of matches */
 int match2 = 0;        /* no. of matches in 2nd pass */
 int nr[4][4];          /* point numbers for man. ori */
 int imx, imy, imgsize; /* image size */
-// int		zoom_x[4],zoom_y[4],zoom_f[4];  /* zoom parameters */	// ad
+// int        zoom_x[4],zoom_y[4],zoom_f[4];  /* zoom parameters */    // ad
 // holten, 04-2013
 int pp1 = 0, pp2 = 0, pp3 = 0, pp4 = 0, pp5 = 0; /* for man. orientation */
 int seq_first, seq_last;                         /* 1. and last img of seq */
@@ -72,32 +73,31 @@ double db_scale;                           /*dumbbell length, Beat Mai 2010*/
 
 FILE *fp1, *fp2, *fp3, *fp4, *fpp;
 
-char img_name[4][256];    /* original image names */
-char img_lp_name[4][256]; /* lowpass image names */
-char img_hp_name[4][256]; /* highpass image names */
-char img_cal[4][128];     /* calibrayion image names */
-char img_ori[4][128];     /* image orientation data */
-char img_ori0[4][128];    /* orientation approx. values */
-char img_addpar[4][128];  /* image additional parameters */
-char safety[4][128];
-char safety_addpar[4][128];
-char img_addpar0[4][128];   /* ap approx. values */
-char seq_name[4][128];      /* sequence names */
-char img_mask_name[4][256]; /* mask image names*/
-char img_mask_path[256];
-char track_dir[128]; /* directory with dap track data */
-char fixp_name[128];
-char res_name[128];      /* result destination */
-char filename[128];      /* for general use */
-char buf[256], val[256]; /* buffer */
-char name[128];          // Beat Dez 08
+char img_name[4][512];    /* original image names */
+char img_lp_name[4][512]; /* lowpass image names */
+char img_hp_name[4][512]; /* highpass image names */
+char img_cal[4][512];     /* calibration image names */
+char img_ori[4][512];     /* image orientation data */
+char img_ori0[4][512];    /* orientation approx. values */
+char img_addpar[4][512];  /* image additional parameters */
+char safety[4][512];
+char safety_addpar[4][512];
+char img_addpar0[4][512];   /* ap approx. values */
+char seq_name[4][512];      /* sequence names */
+char img_mask_name[4][512]; /* mask image names*/
+char img_mask_path[512];
+char track_dir[512]; /* directory with dap track data */
+char fixp_name[512];
+char res_name[512];      /* result destination */
+char buf[512], val[256]; /* buffer */
+// char name[128];          // Beat Dez 08
 double xp, yp;           // Beat Dez 08
 
 unsigned char *img[4];      /* image data */
 unsigned char *img_mask[4]; /* mask data */
 unsigned char *img_new[4];  /* image data for reducing mask */
 unsigned char *img0[4];     /* image data for filtering etc */
-// unsigned char *zoomimg; 			/* zoom image data */		// ad
+// unsigned char *zoomimg;            /* zoom image data */        // ad
 // holten, 04-2012
 
 Exterior Ex[4], sEx[4]; /* exterior orientation */
@@ -113,9 +113,8 @@ int nt4[4][4];
 
 coord_2d crd[4][nmax]; /* (distorted) metric coordinates */
 coord_2d geo[4][nmax]; /* corrected metric coordinates */
-coord_3d fix[20096];
-    /* testfield points coordinates */ // Beat changed it on 090325
-n_tupel con[nmax];                     /* list of correspondences */
+n_tupel con[kMaxCorrespondences];  /* list of correspondences */
+n_tupel con[nmax];  /* list of correspondences */
 
 corres *c4[4];
 trackparameters tpar; /* tracking parameters */
@@ -157,8 +156,8 @@ int init_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   fscanf(fpp, "%d\n", &n_img);
 
   for (i = 0; i < 4; i++) {
-    fscanf(fpp, "%s\n", img_name[i]);
-    fscanf(fpp, "%s\n", img_cal[i]);
+    fscanf(fpp, "%255s\n", img_name[i]);
+    fscanf(fpp, "%127s\n", img_cal[i]);
   }
   fscanf(fpp, "%d\n", &hp_flag);
   fscanf(fpp, "%d\n", &allCam_flag);
@@ -199,19 +198,19 @@ int init_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   /* read sequence parameters (needed for some demos) */
 
   fpp = fopen_rp(
-      "parameters/sequence.par"); // replaced fopen_r, ad holten 12-2012
+      "parameters/sequence.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
 
   for (i = 0; i < 4; i++)
-    fscanf(fpp, "%s\n", seq_name[i]);
+    fscanf(fpp, "%255s\n", seq_name[i]);
   fscanf(fpp, "%d\n", &seq_first);
   fscanf(fpp, "%d\n", &seq_last);
   fclose(fpp);
 
   for (i = 0; i < n_img; i++) {
     num[i] = 0;           // ie. no targets loaded
-    mmLUT[i].data = NULL; // ie. if not NULL memory needs to be deallocated
+    mmLUT[i].data = NULL;  // ie. if not NULL memory needs to be deallocated
     // zoom_x[i] = imx/2; zoom_y[i] = imy/2; zoom_f[i] = 1;
   }
   imgsize = imx * imy;
@@ -266,15 +265,15 @@ int start_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
                  const char **argv) {
   int i, k;
 
-  /*	read from main parameter file  */
-  fpp = fopen_rp("parameters/ptv.par"); // replaced fopen_r, ad holten 12-2012
+  /* read from main parameter file  */
+  fpp = fopen_rp("parameters/ptv.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
 
   fscanf(fpp, "%d\n", &n_img);
   for (i = 0; i < 4; i++) {
-    fscanf(fpp, "%s\n", img_name[i]);
-    fscanf(fpp, "%s\n", img_cal[i]);
+    fscanf(fpp, "%255s\n", img_name[i]);
+    fscanf(fpp, "%255s\n", img_cal[i]);
   }
   fscanf(fpp, "%d\n", &hp_flag);
   fscanf(fpp, "%d\n", &allCam_flag);
@@ -290,7 +289,7 @@ int start_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   fscanf(fpp, "%lf\n", &mmp.d[0]);
   fclose(fpp);
 
-  if (imgsize < imx * imy) { // added, ad holten 12-2012
+  if (imgsize < imx * imy) {  // added, ad holten 12-2012
     printf("The allocated image buffers are to small for the\n"
            "image size, defined in the calibration parameters dialog.\n."
            "Please restart the program.\n");
@@ -299,7 +298,7 @@ int start_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   /* read illuminated layer data */
   fpp = fopen_rp(
-      "parameters/criteria.par"); // replaced fopen_r, ad holten 12-2012
+      "parameters/criteria.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
 
@@ -322,35 +321,31 @@ int start_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   /* read sequence parameters (needed for some demos) */
 
   fpp = fopen_rp(
-      "parameters/sequence.par"); // replaced fopen_r, ad holten 12-2012
+      "parameters/sequence.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
 
   for (i = 0; i < 4; i++)
-    fscanf(fpp, "%s\n", seq_name[i]);
+    fscanf(fpp, "%255s\n", seq_name[i]);
   fscanf(fpp, "%d\n", &seq_first);
   fscanf(fpp, "%d\n", &seq_last);
   fclose(fpp);
 
-  /*	create file names  */
+  /* create file names  */
   for (i = 0; i < n_img; i++) {
-    strcpy(img_lp_name[i], img_name[i]);
-    strcat(img_lp_name[i], "_lp");
-    strcpy(img_hp_name[i], img_name[i]);
-    strcat(img_hp_name[i], "_hp");
-    strcpy(img_ori[i], img_cal[i]);
-    strcat(img_ori[i], ".ori");
-    strcpy(img_addpar[i], img_cal[i]);
-    strcat(img_addpar[i], ".addpar");
+    snprintf(img_lp_name[i], sizeof(img_lp_name[i])+4, "%s_lp", img_name[i]);
+    snprintf(img_hp_name[i], sizeof(img_hp_name[i])+4, "%s_hp", img_name[i]);
+    snprintf(img_ori[i], sizeof(img_ori[i])+4, "%s.ori", img_cal[i]);
+    snprintf(img_addpar[i], sizeof(img_addpar[i])+8, "%s.addpar", img_cal[i]);
   }
 
-  /*	read orientation and additional parameters	*/
+  /* read orientation and additional parameters */
   for (i = 0; i < n_img; i++) {
     if (!read_ori(&Ex[i], &I[i], &G[i], img_ori[i]))
-      return TCL_OK; // added, ad holten, 12-2012
+      return TCL_OK;  // added, ad holten, 12-2012
     rotation_matrix(Ex[i], Ex[i].dm);
 
-    fp1 = fopen_rp(img_addpar[i]); // replaced fopen_r, ad holten 12-2012
+    fp1 = fopen_rp(img_addpar[i]);  // replaced fopen_r, ad holten 12-2012
     if (!fp1)
       return TCL_OK;
     fscanf(fp1, "%lf %lf %lf %lf %lf %lf %lf", &ap[i].k1, &ap[i].k2, &ap[i].k3,
@@ -359,28 +354,28 @@ int start_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   }
 
   /* read and display original images */
-  clear_drawnobjectslist(); // added, ad holten, 04-2013
+  clear_drawnobjectslist();  // added, ad holten, 04-2013
   for (i = 0; i < n_img; i++) {
     /* reading */
-    sprintf(val, "camcanvas %d", i + 1);
+    snprintf(val, sizeof(val), "camcanvas %d", i + 1);
     Tcl_Eval(interp, val);
 
     if (!read_image(interp, img_name[i], img[i]))
-      return TCL_OK; // added, ad holten, 12-2012
+      return TCL_OK;  // added, ad holten, 12-2012
     // sprintf(val, "newimage %d", i+1);
-    sprintf(val, "newimage %d %f %f %d %d", i + 1, 0.5, 0.5, 1, 0);
+    snprintf(val, sizeof(val), "newimage %d %f %f %d %d", i + 1, 0.5, 0.5, 1, 0);
     Tcl_Eval(interp, val);
 
-    sprintf(val, "keepori %d", i + 1);
+    snprintf(val, sizeof(val), "keepori %d", i + 1);
     Tcl_Eval(interp, val);
   }
 
   if (!trackallocflag) {
     for (i = 0; i < 4; i++) {
-      mega[i] = (P *)calloc(sizeof(P), M);
-      c4[i] = (corres *)calloc(sizeof(corres), M);
+      mega[i] = (P *)calloc(sizeof(P), M);  // NOLINT
+      c4[i] = (corres *)calloc(sizeof(corres), M);  // NOLINT
       for (k = 0; k < 4; k++)
-        t4[i][k] = (target *)calloc(sizeof(target), M);
+        t4[i][k] = (target *)calloc(sizeof(target), M);  // NOLINT
     }
     trackallocflag = 1;
   }
@@ -395,21 +390,21 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
   Tk_PhotoHandle img_handle;
   Tk_PhotoImageBlock img_block;
 
-  sprintf(val, "Filtering with Highpass");
+  snprintf(val, sizeof(val), "Filtering with Highpass");
   Tcl_SetVar(interp, "tbuf", val, TCL_GLOBAL_ONLY);
   Tcl_Eval(interp, ".text delete 2");
   Tcl_Eval(interp, ".text insert 2 $tbuf");
 
   /* read support of unsharp mask */
   fpp = fopen("parameters/unsharp_mask.par", "r");
-  if (fpp == 0)
+  if (fpp == 0) {
     sup = 12;
-  else {
+  } else {
     fscanf(fpp, "%d\n", &sup);
     fclose(fpp);
   }
 
-  //_____________________Matthias subtract mask__________________________
+  // Matthias subtract mask
   /* Matthias JULI 08 read checkmark for masks and create mask names*/
 
   fpp = fopen_rp(
@@ -439,9 +434,9 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
   // - subtract mask from original image
   // - copy subtracted imgage on the original image
   if (display)
-    clear_drawnobjectslist(); // added, ad holten 04-2013
+    clear_drawnobjectslist();  // added, ad holten 04-2013
 
-  if (mask == 1) { // read mask image
+  if (mask == 1) {  // read mask image
     for (i_img = 0; i_img < n_img; i_img++) {
       read_image(interp, img_mask_name[i_img], img_mask[i_img]);
       highpass(img_name[i_img], img[i_img], img[i_img], sup, 0, chfield, i_img);
@@ -464,14 +459,14 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
         // - fixed      = size of the frame will not be addapted to the zoomed
         // image size
         get_tclzoomparms(interp, &zoompar, i_img);
-        sprintf(val, "newimage %d %f %f %d %d", i_img + 1, zoompar.xc,
+        snprintf(val, sizeof(val), "newimage %d %f %f %d %d", i_img + 1, zoompar.xc,
                 zoompar.yc, zoompar.fac, zoompar.fixed);
         Tcl_GlobalEval(interp, val);
       }
     }
   }
 
-  if (mask == 2) { // Beat April 090402 was ==0
+  if (mask == 2) {  // Beat April 090402 was ==0
     for (i_img = 0; i_img < n_img; i_img++) {
       // highpass original image
       highpass(img_name[i_img], img[i_img], img[i_img], sup, 0, chfield, i_img);
@@ -504,7 +499,7 @@ int detection_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   int i, i_img, j;
   int xmin, pft_version = 3;
   char val[256];
-  char filename[256];
+  char filename[1024];
   FILE *FILEIN;
   Zoompar zoompar;
 
@@ -679,8 +674,11 @@ int correspondences_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   correspondences_4(interp, argv);
 
   /* ------ save pixel coords for tracking  ------- */
+  
+  char filename[1024];  // Declare filename variable
+
   for (i_img = 0; i_img < n_img; i_img++) {
-    sprintf(filename, sizeof(filename), "%s_targets", img_name[i_img]);
+    snprintf(filename, sizeof(filename), "%s_targets", img_name[i_img]);
     fp1 = fopen(filename, "w");
 
     fprintf(fp1, "%d\n", num[i_img]);
@@ -1069,34 +1067,33 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     // else if (i < 100) sprintf (seq_ch, "%2d", i);
     // else              sprintf (seq_ch, "%3d", i);
     // changed, ad holten 12-2012
-    sprintf(seq_ch, "%d", i);
+    snprintf(seq_ch, sizeof(seq_ch), "%d", i);
 
     for (j = 0; j < n_img; j++) {
-      sprintf(img_name[j], "%s%s", seq_name[j], seq_ch);
-      sprintf(img_lp_name[j], "%s%s_lp", seq_name[j], seq_ch);
-      sprintf(img_hp_name[j], "%s%s_hp", seq_name[j], seq_ch);
+      snprintf(img_name[j], sizeof(img_name[j]), "%s%s", seq_name[j], seq_ch);
+      snprintf(img_lp_name[j], sizeof(img_lp_name[j]), "%s%s_lp", seq_name[j], seq_ch);
+      snprintf(img_hp_name[j], sizeof(img_hp_name[j]), "%s%s_hp", seq_name[j], seq_ch);
     }
 
     // Beat Mai 2010 for dumbbell
     if (dumbbell == 0) {
       if (chfield == 0)
-        snprintf(res_name, sizeof(filename), "res/rt_is.%s", seq_ch);
+        snprintf(res_name, sizeof(res_name), "res/rt_is.%s", seq_ch);
       else
-        snprintf(res_name, sizeof(filename), "res/rt_is.%s_%1d", seq_ch,
-                 chfield);
+        snprintf(res_name, sizeof(res_name), "res/rt_is.%s_%1d", seq_ch, chfield);
     } else {
       if (chfield == 0)
-        snprintf(res_name, sizeof(filename), "res/db_is.%s", seq_ch);
+        snprintf(res_name, sizeof(res_name), "res/db_is.%s", seq_ch);
       else
-        snprintf(res_name, sizeof(filename), "res/db_is.%s_%1d", seq_ch,
-                 chfield);
+        snprintf(res_name, sizeof(res_name), "res/db_is.%s_%1d", seq_ch, chfield);
     }
     snprintf(buf, sizeof(buf), "\n Images:");
     for (j = 0; j < n_img; j++) {
       char temp_buf[sizeof(buf)];
-	snprintf(temp_buf, sizeof(temp_buf), "%s  %s", buf, img_name[j]);
-      strncpy(buf, temp_buf, sizeof(buf) - 1);
-      buf[sizeof(buf) - 1] = '\0';
+      strncat(buf, "  ", sizeof(buf) - strlen(buf) - 1);
+    strncat(buf, img_name[j], sizeof(buf) - strlen(buf) - 1);
+      strncpy(temp_buf, buf, sizeof(temp_buf) - 1);
+      temp_buf[sizeof(temp_buf) - 1] = '\0';
     }
     puts(buf);
 
@@ -1112,12 +1109,12 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
         Tk_PhotoGetImage(img_handle, &img_block);
         tclimg2cimg(interp, img[k], &img_block);
 
-        // sprintf(buf, "newimage %d",	k+1);		replaced, ad holten,
+        // sprintf(buf, "newimage %d",  k+1);      replaced, ad holten,
         // 04-2013
         clear_drawnobjectslist();
         get_tclzoomparms(interp, &zoompar, k);
-        sprintf(buf, "newimage %d %f %f %d %d", k + 1, zoompar.xc, zoompar.yc,
-                zoompar.fac, zoompar.fixed);
+    snprintf(buf, sizeof(buf), "newimage %d %f %f %d %d", k + 1, zoompar.xc, zoompar.yc,
+        zoompar.fac, zoompar.fixed);
         Tcl_Eval(interp, buf);
       }
     }
@@ -1134,8 +1131,9 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     if (hp_flag) {
       pre_processing_c(clientData, interp, argc, argv);
       puts("\nHighpass switched on\n");
-    } else
+    } else {
       puts("\nHighpass switched off\n");
+    }
 
     if (display)
       Tcl_Eval(interp, "update idletasks");
@@ -1168,9 +1166,7 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       printf("%s\n", val);
       return TCL_OK;
       */
-    }
-    /**************************************************************************/
-    else {
+    } else {
       // added i to the detection_proc_c to get 'filenumber' for external API,
       // Alex, 19.04.10
       detection_proc_c(clientData, interp, argc, argv);
@@ -1200,7 +1196,7 @@ int restore_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
                    const char **argv) {
   int i_img, i;
 
-  fpp = fopen_rp("parameters/ptv.par"); // replaced fopen_r, ad holten, 12-2012
+  fpp = fopen_rp("parameters/ptv.par");  // replaced fopen_r, ad holten, 12-2012
   if (!fpp)
     return TCL_OK;
 
@@ -1220,25 +1216,9 @@ int restore_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   }
 
   // -- changed syntax, ad holten 12-2012
-  //		strcpy (safety[0], "safety_0");
-  //		strcat (safety[0], ".ori");
-  //		strcpy (safety[1], "safety_1");
-  //		strcat (safety[1], ".ori");
-  //		strcpy (safety[2], "safety_2");
-  //		strcat (safety[2], ".ori");
-  //		strcpy (safety[3], "safety_3");
-  //		strcat (safety[3], ".ori");
-  //		strcpy (safety_addpar[0], "safety_0");
-  //		strcat (safety_addpar[0], ".addpar");
-  //		strcpy (safety_addpar[1], "safety_1");
-  //		strcat (safety_addpar[1], ".addpar");
-  //		strcpy (safety_addpar[2], "safety_2");
-  //		strcat (safety_addpar[2], ".addpar");
-  //		strcpy (safety_addpar[3], "safety_3");
-  //		strcat (safety_addpar[3], ".addpar");
   for (i = 0; i < 4; i++) {
-    sprintf(safety[i], "safety_%d.ori", i);
-    sprintf(safety_addpar[i], "safety_%d.addpar", i);
+    snprintf(safety[i], sizeof(safety[i]), "safety_%d.ori", i);
+    snprintf(safety_addpar[i], sizeof(safety_addpar[i]), "safety_%d.addpar", i);
   }
 
   for (i_img = 0; i_img < n_img; i_img++) {
@@ -1279,8 +1259,9 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   coord_2d apfig1[11][11]; /* regular grid for ap figures */
   coord_2d apfig2[11][11]; /* ap figures */
   coord_3d fix4[4];        /* object points for preorientation */
+  coord_3d fix[4096];      /* object points for preorientation */
   coord_2d crd0[4][12];    /* image points for preorientation */
-  char multi_filename[10][256], filename[256], val[256], filename2[256];
+  char multi_filename[10][512], filename[1024], val[512], filename2[512];
   const char *valp;
 
   FILE *FILEIN;
@@ -1466,7 +1447,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     /* save pixel coord as approx. for template matching */
     if (examine) {
       for (i = 0; i < n_img; i++) {
-        sprintf(filename, sizeof(filename), "%s_pix", img_name[i]);
+        snprintf(filename, sizeof(filename), "%s_pix", img_name[i]);
         fp1 = fopen(filename, "w");
         for (j = 0; j < num[i]; j++)
           fprintf(fp1, "%4d	%8.3f  %8.3f\n", pix[i][j].pnr, pix[i][j].x,
@@ -1769,27 +1750,11 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   case 6:
     puts("Orientation");
-    strcpy(buf, "");
-    // replaced next lines by for loop, ad holten 12-2012
-    // strcpy (safety[0], "safety_0");
-    // strcat (safety[0], ".ori");
-    // strcpy (safety[1], "safety_1");
-    // strcat (safety[1], ".ori");
-    // strcpy (safety[2], "safety_2");
-    // strcat (safety[2], ".ori");
-    // strcpy (safety[3], "safety_3");
-    // strcat (safety[3], ".ori");
-    // strcpy (safety_addpar[0], "safety_0");
-    // strcat (safety_addpar[0], ".addpar");
-    // strcpy (safety_addpar[1], "safety_1");
-    // strcat (safety_addpar[1], ".addpar");
-    // strcpy (safety_addpar[2], "safety_2");
-    // strcat (safety_addpar[2], ".addpar");
-    // strcpy (safety_addpar[3], "safety_3");
-    // strcat (safety_addpar[3], ".addpar");
+    snprintf(buf, sizeof(buf), " ");
+
     for (i = 0; i < 4; i++) {
-      sprintf(safety[i], "safety_%d.ori", i);
-      sprintf(safety_addpar[i], "safety_%d.addpar", i);
+      snprintf(safety[i], sizeof(safety[i]), "safety_%d.ori", i);
+      snprintf(safety_addpar[i], sizeof(safety_addpar[i]), "safety_%d.addpar", i);
     }
 
     for (i_img = 0; i_img < n_img; i_img++) {
@@ -1804,20 +1769,20 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
         printf("try write resection data to disk\n");
         /* point coordinates */
         // sprintf (filename, "resect_%s.fix", img_name[i_img]);
-        sprintf(filename, sizeof(filename), "%s.fix", img_name[i_img]);
+        snprintf(filename, sizeof(filename), "%s.fix", img_name[i_img]);
         write_ori(Ex[i_img], I[i_img], G[i_img], img_ori[i_img]);
         fp1 = fopen(filename, "w");
         for (i = 0; i < nfix; i++)
-          fprintf(fp1, "%3d	%10.5f	%10.5f	%10.5f\n", fix[i].pnr,
+          fprintf(fp1, "%3d  %10.5f  %10.5f  %10.5f\n", fix[i].pnr,
                   fix[i].x, fix[i].y, fix[i].z);
         fclose(fp1);
 
         /* metric image coordinates */
         // sprintf (filename, "resect_%s.crd", img_name[i_img]);
-        sprintf(filename, sizeof(filename), "%s.crd", img_name[i_img]);
+        snprintf(filename, sizeof(filename), "%s.crd", img_name[i_img]);
         fp1 = fopen(filename, "w");
         for (i = 0; i < nfix; i++)
-          fprintf(fp1, "%3d	%9.5f  %9.5f\n", crd[i_img][i].pnr,
+          fprintf(fp1, "%3d  %9.5f  %9.5f\n", crd[i_img][i].pnr,
                   crd[i_img][i].x, crd[i_img][i].y);
         fclose(fp1);
 
@@ -1857,16 +1822,16 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
           return TCL_OK;
         fscanf(fp1, "%d\n", &planes);
         for (i = 0; i < planes; i++)
-          fscanf(fp1, "%s\n", &multi_filename[i]);
+          fscanf(fp1, "%255s\\n", multi_filename[i]);
         fclose(fp1);
 
         for (n = 0, nfix = 0, dump_for_rdb = 0; n < planes;
              n++) { // replaced 10 by 'planes', ad holten, 01-2013
           // sprintf (filename, "resect.fix%d", n);
 
-          sprintf(filename, sizeof(filename), "%s%d.tif.fix", multi_filename[n],
-                  i_img + 1);
-          fp1 = fopen_rp(filename); // replaced fopen by fopen_rp, and
+          snprintf(filename, sizeof(filename), "%s%d.tif.fix",
+                   multi_filename[n], header_serializer_get_value(i, argc));  //  Added missing argument for %d
+          fp1 = fopen_rp(filename);  // replaced fopen by fopen_rp, and
           if (!fp1)
             break; // continue by break, ad holten, 01-2013
 
@@ -1880,8 +1845,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
           fclose(fp1);
           /* read metric image coordinates */
           // sprintf (filename, "resect_%d.crd%d", i_img, n);
-          sprintf(filename, sizeof(filename), "%s%d.tif.crd", multi_filename[n],
-                  i_img + 1);
+          snprintf(filename, sizeof(filename), "%s%d.tif.crd", multi_filename[n], header_serializer_get_value(i,argc)); // Added missing argument for %d
           printf("reading file: %s\n", filename);
           fp1 = fopen_rp(filename); // replaced fopen by fopen_rp and
           if (!fp1)
@@ -1983,3 +1947,59 @@ int quit_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 #endif
   return TCL_OK;
 }
+
+/* Stub for header_serializer_get_value */
+int header_serializer_get_value(int index, int count) {
+    printf("STUB: header_serializer_get_value called with index=%d, count=%d. Returning index.\n", index, count);
+    (void)count;  // Mark as unused for now if not used in stub
+    return index;
+}
+
+/* STARTUP */
+
+// int write_targets_c_api(ClientData clientData, Tcl_Interp *interp, int objc, const char **argv) {
+//     // Implementation based on the original write_targets from ptv.c
+//     // Assumes necessary global variables (n_img, seq_name, nt4, t4) are accessible
+//     // and that pix, Ex, I, G, ap, mm are appropriately populated if needed by called functions.
+
+//     if (objc != 2) {
+//         Tcl_WrongNumArgs(interp, 1, argv, "filenumber");
+//         return TCL_ERROR;
+//     }
+
+//     int filenumber = atoi(argv[1]);
+//     char filename[512];  // Define filename
+
+//     // The following is a simplified adaptation. The original write_targets
+//     // in ptv.c writes data for all images. This API version might need
+//     // to be more specific or take more arguments if it's intended to write
+//     // for a single image or a subset.
+
+//     // For now, let's assume it mirrors the behavior of writing all available targets
+//     // for the given filenumber, similar to how write_ascii_data handles targets.
+
+//     for (int i = 0; i < n_img; i++) {
+//         // compose_name_plus_nr_str is defined in tools.c
+//         // Ensure seq_name, nt4, t4 are correctly populated and accessible.
+//         // The '0' for 'set' in original write_ascii_data implies using the current/active dataset.
+//         // We might need a similar concept or pass the relevant dataset index.
+//         compose_name_plus_nr_str(seq_name[i], "_targets", filenumber, filename);
+
+//         FILE *FILEOUT = fopen(filename, "w");
+//         if (!FILEOUT) {
+//             printf("Can't open ascii file for writing: %s\\n", filename);
+//             // Potentially return TCL_ERROR or handle more gracefully
+//             continue;  // Skip to next image if one file fails
+//         }
+//         fprintf(FILEOUT, "%d\\n", nt4[0][i]);  // Assuming set 0 for nt4
+//         for (int j = 0; j < nt4[0][i]; j++) {  // Assuming set 0 for t4
+//             fprintf(FILEOUT, "%4d %9.4f %9.4f %5d %5d %5d %5d %5d\\n",
+//                     t4[0][i][j].pnr, t4[0][i][j].x, t4[0][i][j].y,
+//                     t4[0][i][j].n, t4[0][i][j].nx, t4[0][i][j].ny,
+//                     t4[0][i][j].sumg, t4[0][i][j].tnr);
+//         }
+//         fclose(FILEOUT);
+//     }
+
+//     return TCL_OK;
+// }

@@ -1,7 +1,9 @@
+/* Copyright 2024 3DPTV Contributors */
 /*  global declarations for ptv  */
-#ifndef CUSTOM_BOOL_DEFINED
-#define CUSTOM_BOOL_DEFINED
-#include <stdbool.h> // Provides bool, true, false
+#ifndef SRC_C_GLOBALS_H_
+#define SRC_C_GLOBALS_H_
+
+#include <stdbool.h>  // Provides bool, true, false
 typedef bool BOOL;   // Typedef BOOL from the standard bool
 // TRUE and FALSE macros might still be needed if the code uses them
 // instead of true and false.
@@ -11,10 +13,12 @@ typedef bool BOOL;   // Typedef BOOL from the standard bool
 #ifndef FALSE
 #define FALSE false
 #endif
-#endif // CUSTOM_BOOL_DEFINED
 
 
 #define nmax 20240
+#define MAX_IMAGES 4
+#define MAX_TARGETS 20000  // Max number of targets per image
+#define MAX_CANDIDATES 100
 
 // zooming
 enum MARKTYPES  {OBJ_MARK, OBJ_CROSS, OBJ_VECTOR, OBJ_PNR, OBJ_VALUE, OBJ_OVAL};
@@ -40,7 +44,7 @@ extern  int     corp, corc, corn;               /* no. of correspondences in p,c
 extern  int     nr[4][4];                       /* point numbers for man. ori */
 extern  int     imx, imy, imgsize;              /* image size */
 extern  int     zoom_x[], zoom_y[], zoom_f[];   /* zoom parameters */
-extern  int     pp1, pp2, pp3, pp4,pp5;         /* for man. orientation */
+extern  int     pp1, pp2, pp3, pp4, pp5;         /* for man. orientation */
 extern  int     seq_first, seq_last;            /* 1. and last img of seq */
 extern  int     demo_nr;                        /* for demo purposes */
 extern  int     examine;                        /* extra output */
@@ -55,24 +59,46 @@ extern  double  pi, ro;                         /* pi, ro */
 extern  double  cn, cnx, cny, csumg, eps0, corrmin; /* correspond. par */
 extern  double  rmsX, rmsY, rmsZ, mean_sigma0;      /* a priori rms */
 extern  double  X_lay[], Zmin_lay[], Zmax_lay[];    /* illu. layer current slice */
-extern  double  db_scale;                       /*dumbbell length, Beat Mai 2010*/ 
+extern  double  db_scale; /*dumbbell length, Beat Mai 2010*/
 
 extern  FILE    *fp1, *fp2, *fp3, *fp4, *fpp;   /* file pointers */
 
-extern  char  img_name[4][256];                 /* original image names */
-extern  char  img_lp_name[4][256];              /* lowpass image names */
-extern  char  img_hp_name[4][256];              /* highpass image names */
-extern  char  img_cal[4][128];                  /* calibration image names */
-extern  char  img_ori[4][128];                  /* image orientation data */
-extern  char  img_ori0[4][128];                 /* orientation approx. values */
-extern  char  img_addpar0[4][128];              /* approx. image additional parameters */
-extern  char  img_addpar[4][128];               /* image additional parameters */
-extern  char  fixp_name[128];                   /* testfield fixpoints */
-extern  char  seq_name[4][128];                 /* sequence names */
-extern  char  track_dir[128];                   /* directory with dap track data */
-extern  char  res_name[128];                    /* result destination */
-extern  char  buf[], val[];                     /* buffer */
-extern  char  filename[128];
+extern  char  img_name[4][512];                 /* original image names */
+extern  char  img_lp_name[4][512];              /* lowpass image names */
+extern  char  img_hp_name[4][512];              /* highpass image names */
+extern  char  img_cal[4][512];                  /* calibration image names */
+extern  char  img_ori[4][512];                  /* image orientation data */
+extern  char  img_ori0[4][512];                 /* orientation approx. values */
+extern  char  img_addpar0[4][512];              /* approx. image additional parameters */
+extern  char  img_addpar[4][512];               /* image additional parameters */
+extern  char  fixp_name[512];                   /* testfield fixpoints */
+extern  char  seq_name[4][512];                 /* sequence names */
+extern  char  track_dir[512];                   /* directory with dap track data */
+extern  char  res_name[512];                    /* result destination */
+extern  char  par_name[512];
+extern  char  base_name[512];
+
+extern char	cal_img_base_name[4][512];
+extern char	tiff_img_name[4][512];
+extern char	target_name[4][512];
+extern char	linkage_name[4][512];
+extern char	prio_name[512];
+extern char	added_name[512];
+extern char	cal_db_name[512];
+extern char	cor_name[512];
+extern char	seq_log_name[512];
+extern char	track_log_name[512];
+extern char	traj_name[512];
+extern char	rtf_name[512];
+extern char	sum_name[512];
+extern char	connect_name[512];
+
+#define MAX_PLANES 10  // Define MAX_PLANES with an appropriate value
+
+extern char multi_filename[MAX_PLANES][512];
+extern char filename_in[10][512];
+extern char	filename_out[512];
+extern char	textline[512];
 
 extern  unsigned char *img[];                   /* image data */
 extern  unsigned char *zoomimg;                 /* zomm image data */
@@ -111,7 +137,7 @@ int  parameter_panel_init(Tcl_Interp* interp);
 int  done_proc_c(ClientData clientData, Tcl_Interp* interp, int argc, const char** argv);
 
 // --- checkpoints.c ---
-void checkpoint_proc (Tcl_Interp* interp);
+void checkpoint_proc(Tcl_Interp* interp);
 
 // --- correspondences.c ---
 void correspondences_4 (Tcl_Interp* interp, const char** argv);
@@ -237,6 +263,7 @@ void  det_lsq_2 (Exterior Ex[2], Interior I[2], Glass G[2], ap_52 ap[2], mm_np m
 // --- ptv.c ---
 void  read_ascii_data(int filenumber);
 void  read_targets(int i_img, int filenumber,  int *num);
+void  write_targets(int n_img, char **img_name, int *num, target **pix);
 void  write_ascii_data(int filenumber);
 void  write_added(int filenumber);
 void  write_addedback(int filenumber);
@@ -326,7 +353,14 @@ void  readseqtrackcrit ();
 void  searchquader(double X, double Y, double Z, 
 				  double xr[4], double xl[4], double yd[4], double yu[4]);
 void  sortwhatfound (foundpix item[16], int *zaehler);
-void  angle_acc(double X0, double Y0, double Z0, double X1, double Y1, double Z1, 
+void  angle_acc(double X0, double Y0, double Z0, double X1, double Y1, double Z1, \
 			   double X2, double Y2, double Z2, double *angle, double *acc);
+
+
+// --- Missing function stubs ---
+int header_serializer_get_value(int index, int count);
+
+
+#endif  // SRC_C_GLOBALS_H_
 
 

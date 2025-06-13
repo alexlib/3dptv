@@ -388,14 +388,14 @@ void find_candidate_plus(coord_2d crd[], target pix[], int num, double xa,
           corr *= ((double)(sumg + pix[p2].sumg));
 
           if (qn >= cn && qnx >= cnx && qny >= cny && qsumg > csumg) {
-            if (*count < maxcand) {
+            if (*count < MAXCAND) {
               cand[*count].pnr = j;
               cand[*count].tol = d;
               cand[*count].corr = corr;
               (*count)++;
             } else {
-              dummy = (int)maxcand;
-              printf("in find_candidate_plus: count > maxcand\n");
+              dummy = (int)MAXCAND;
+              printf("in find_candidate_plus: count > MAXCAND\n");
             }
           }
         }
@@ -503,8 +503,8 @@ void find_candidate_plus_msg(coord_2d crd[], target pix[], int num, double xa,
           corr *= ((double)(sumg + pix[p2].sumg));
 
           if (qn >= cn && qnx >= cnx && qny >= cny && qsumg > csumg) {
-            if (*count >= maxcand) {
-              printf("More candidates than (maxcand): %d\n", *count);
+            if (*count >= MAXCAND) {
+              printf("More candidates than (MAXCAND): %d\n", *count);
               return;
             }
             cand[*count].pnr = p2;

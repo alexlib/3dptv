@@ -243,14 +243,14 @@ int draw_pnr(Tcl_Interp *interp, int x, int y, int pnr, int imgnr,
 
 int draw_pnr_autohide(Tcl_Interp *interp, int x, int y, int pnr, int imgnr,
                       char color[], int minzoomlevel, int zoomlevel) {
-  char buf[256], val[256];
-  if (!skip_adding) // add pnr to the objects to be redrawn
+  char buf[512], val[256];
+  if (!skip_adding)  //  add pnr to the objects to be redrawn
     add_pnr(x, y, pnr, imgnr, color, minzoomlevel);
 
   if (zoomlevel >= minzoomlevel) {
-    img_to_view_coordinates(&x, &y, (double)x, (double)y, imgnr);
-    sprintf(val, "%d", pnr);
-    sprintf(buf, "drawtext %d %d %s %d %s", x, y, val, imgnr + 1, color);
+    img_to_view_coordinates(&x, &y, (double)(x), (double)(y), imgnr);  // NOLINT
+    snprintf(val, sizeof(val), "%d", pnr);
+    snprintf(buf, sizeof(buf), "drawtext %d %d %s %d %s", x, y, val, imgnr + 1, color);
     Tcl_Eval(interp, buf);
   }
   return TCL_OK;
@@ -265,14 +265,14 @@ int draw_value(Tcl_Interp *interp, int x, int y, double pnr, int imgnr,
 
 int draw_value_autohide(Tcl_Interp *interp, int x, int y, double pnr, int imgnr,
                         char color[], int minzoomlevel, int zoomlevel) {
-  char buf[256], val[256];
-  if (!skip_adding) // add value to the objects to be redrawn
+  char buf[512], val[256];
+  if (!skip_adding)  // add value to the objects to be redrawn
     add_value(x, y, pnr, imgnr, color, minzoomlevel);
 
   if (zoomlevel >= minzoomlevel) {
-    img_to_view_coordinates(&x, &y, (double)x, (double)y, imgnr);
-    sprintf(val, "%5.3f", pnr);
-    sprintf(buf, "drawtext %d %d %s %d %s", x, y, val, imgnr + 1, color);
+    img_to_view_coordinates(&x, &y, (double)x, (double)y, imgnr);  // NOLINT
+    snprintf(val, sizeof(val), "%5.3f", pnr);
+    snprintf(buf, sizeof(buf), "drawtext %d %d %s %d %s", x, y, val, imgnr + 1, color);
     Tcl_Eval(interp, buf);
   }
   return TCL_OK;
@@ -422,8 +422,7 @@ BOOL isinview(double x, double y, int i_img) {
 }
 
 int mark_track_c(ClientData clientData, Tcl_Interp *interp, int argc,
-                 const char **argv)
-/* draws crosses for detected points in a displayed image */
+                 const char **argv) /* draws crosses for detected points in a displayed image */
 {
   char seq_name[4][128];
   int i_img, i_seq, h, intx, inty;
@@ -432,7 +431,7 @@ int mark_track_c(ClientData clientData, Tcl_Interp *interp, int argc,
   cr_sz = atoi(Tcl_GetVar2(interp, "mp", "pcrossize", TCL_GLOBAL_ONLY));
 
   fpp = fopen_rp(
-      "parameters/sequence.par"); // replaced fopen_r, ad holten 12-2012
+      "parameters/sequence.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
   for (i_img = 0; i_img < 4; i_img++)
@@ -443,13 +442,14 @@ int mark_track_c(ClientData clientData, Tcl_Interp *interp, int argc,
   fscanf(fpp, "%d\n", &seq_last);
   fclose(fpp);
 
-  sprintf(buf, "Show detected particles ");
+  char buf[256];
+  snprintf(buf, sizeof(buf), "Show detected particles ");
   puts(buf);
   Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
   Tcl_Eval(interp, ".text delete 2");
   Tcl_Eval(interp, ".text insert 2 $tbuf");
 
-  for (i_img = 0; i_img < n_img; i_img++) // added, ad holten, 04-2013
+  for (i_img = 0; i_img < n_img; i_img++)  // added, ad holten, 04-2013
     get_tclzoomparms(interp, &zoompar[i_img], i_img);
   clear_drawnobjectslist();
 
@@ -468,22 +468,24 @@ int mark_track_c(ClientData clientData, Tcl_Interp *interp, int argc,
           // holten, 04-2013 intx =
           // (int)(imx/2+zoom_f[i_img]*(t4[3][i_img][h].x-zoom_x[i_img])); inty
           // = (int)(imy/2+zoom_f[i_img]*(t4[3][i_img][h].y-zoom_y[i_img]));
-          img_to_view_coordinates(&intx, &inty, (int)t4[3][i_img][h].x,
-                                  (int)t4[3][i_img][h].y, i_img);
+          img_to_view_coordinates(&intx, &inty, (int)t4[3][i_img][h].x,  // NOLINT
+                                  (int)t4[3][i_img][h].y, i_img);  // NOLINT
           if (t4[3][i_img][h].tnr > -1) {
             drawcross(interp, intx, inty, cr_sz + 1, i_img, "green");
             if (zoompar[i_img].fac >= 6) {
               draw_pnr(interp, intx, inty + 10, i_seq, i_img, "orange");
               draw_pnr(interp, intx, inty, t4[3][i_img][h].tnr, i_img, "green");
             }
-          } else
+          } else {
             drawcross(interp, intx, inty, cr_sz, i_img, "blue");
+          }
         }
       }
       Tcl_Eval(interp, "update idletasks");
     }
   }
-  sprintf(val, "...done");
+  char val[256];
+  snprintf(val, sizeof(val), "...done");
   Tcl_SetVar(interp, "tbuf", val, TCL_GLOBAL_ONLY);
   Tcl_Eval(interp, ".text delete 3");
   Tcl_Eval(interp, ".text insert 3 $tbuf");
@@ -499,6 +501,7 @@ int trajectories_c(ClientData clientData, Tcl_Interp *interp, int argc,
   int i, anz1, anz2, m, j;
   FILE *fp1;
   char val[256];
+  char buf[256];
   vector *line1, *line2;
   double color;
   coord_2d p1[4], p2[4];
@@ -506,7 +509,7 @@ int trajectories_c(ClientData clientData, Tcl_Interp *interp, int argc,
   cr_sz = atoi(Tcl_GetVar2(interp, "mp", "pcrossize", TCL_GLOBAL_ONLY));
 
   fpp = fopen_rp(
-      "parameters/sequence.par"); // replaced fopen_r, ad holten 12-2012
+      "parameters/sequence.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
 
@@ -515,25 +518,25 @@ int trajectories_c(ClientData clientData, Tcl_Interp *interp, int argc,
   fscanf(fpp, "%d\n", &seq_last);
   fclose(fpp);
 
-  sprintf(buf, "Show trajectories ");
+  snprintf(buf, sizeof(buf), "Show trajectories ");
   puts(buf);
   Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
   Tcl_Eval(interp, ".text delete 2");
   Tcl_Eval(interp, ".text insert 2 $tbuf");
 
-  line1 = line2 = NULL; // added, ad holten, 12-2012
+  line1 = line2 = NULL;  // added, ad holten, 12-2012
   for (i = seq_first; i < seq_last; i++) {
     // ad holten, 12-2012, replaced next lines
-    //		 if      (i < 10)  sprintf (val, "res/ptv_is.%1d", i);
-    //		 else if (i < 100) sprintf (val, "res/ptv_is.%2d", i);
-    //		 else			   sprintf (val, "res/ptv_is.%3d", i);
-    sprintf(val, "res/ptv_is.%d", i);
+    // if      (i < 10)  sprintf (val, "res/ptv_is.%1d", i);
+    // else if (i < 100) sprintf (val, "res/ptv_is.%2d", i);
+    //       else               sprintf (val, "res/ptv_is.%3d", i);
+    snprintf(val, sizeof(val), "res/ptv_is.%d", i);
 
-    fp1 = fopen_rp(val); // replaced fopen, ad holten 12-2012
+    fp1 = fopen_rp(val);  // replaced fopen, ad holten 12-2012
     if (!fp1)
       break;
 
-    color = ((double)(i - seq_first)) / ((double)(seq_last - 2 - seq_first));
+    color = ((double)(i - seq_first)) / ((double)(seq_last - 2 - seq_first));  // NOLINT
     fscanf(fp1, "%d\n", &anz1);
 
     line1 = (vector *)malloc(anz1 * sizeof(vector));
@@ -549,18 +552,18 @@ int trajectories_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
     /* read next time step */
     // ad holten, 12-2012, replaced next lines,
-    //		if (i+1 < 10)       sprintf (val, "res/ptv_is.%1d", i+1);
-    //		else if (i+1 < 100) sprintf (val, "res/ptv_is.%2d", i+1);
-    //		else				sprintf (val, "res/ptv_is.%3d",
-    //i+1);
-    sprintf(val, "res/ptv_is.%d", i + 1);
+    // if (i+1 < 10)       sprintf (val, "res/ptv_is.%1d", i+1);
+    // else if (i+1 < 100) sprintf (val, "res/ptv_is.%2d", i+1);
+    // else sprintf (val, "res/ptv_is.%3d",
+    // i+1);
+    snprintf(val, sizeof(val), "res/ptv_is.%d", i + 1);
 
-    fp1 = fopen_rp(val); // replaced fopen, ad holten 12-2012
+    fp1 = fopen_rp(val);  // replaced fopen, ad holten 12-2012
     if (!fp1)
       break;
 
     fscanf(fp1, "%d\n", &anz2);
-    line2 = (vector *)calloc(anz2, sizeof(vector));
+    line2 = (vector *)calloc(anz2, sizeof(vector));  // NOLINT
 
     for (j = 0; j < anz2; j++) {
       fscanf(fp1, "%d\n", &line2[j].p);
