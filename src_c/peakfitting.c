@@ -100,7 +100,7 @@ int peak_fit_new (Tcl_Interp* interp, unsigned char *img, char par_file[],
 	puts("Searching local maxima, connectivity analysis, peak factor 2 set");
 
 	//for (i=ymin; i<ymax-1; i++)
-	//	for (j=xmin; j<xmax; j++) //Beat Lüthi Jan 09 I changed to (i=ymin; i<ymax-1; i++), new:-1
+	//	for (j=xmin; j<xmax; j++) //Beat LÂ¸thi Jan 09 I changed to (i=ymin; i<ymax-1; i++), new:-1
 	
 	// replaced by the next code to avoid passing image bounds, ad holten 12-2012
 	if (ymin < 1)     ymin = 1;
@@ -178,7 +178,7 @@ int peak_fit_new (Tcl_Interp* interp, unsigned char *img, char par_file[],
 					if (   (gv > thres)
 						&& (gv <= gvref+disco)
 						//		removed the image borders test from Beat, ad holten, 2012
-						//		&& (xn>=xmin)&&(xn<xmax) && (yn>=ymin)&&(yn<ymax-1)//Beat Lüthi Jan 09 I changed to (i=ymin; i<ymax-1; i++), new:-1
+						//		&& (xn>=xmin)&&(xn<xmax) && (yn>=ymin)&&(yn<ymax-1)//Beat LÂ¸thi Jan 09 I changed to (i=ymin; i<ymax-1; i++), new:-1
 						&& (gvref + disco >= *(img + imx*(yn-1) + xn))
 						&& (gvref + disco >= *(img + imx*(yn+1) + xn))
 						&& (gvref + disco >= *(img + imx*yn + (xn-1)))

@@ -64,7 +64,7 @@ void orient (Tcl_Interp* interp, Exterior Ex0, Interior I0, Glass G0, ap_52 ap0,
 			Xp, Yp, Zp, xp, yp, xpd, ypd, r, qq;
 	FILE	*fp1;
 	int 	dummy, multi;
-	Zoompar zoompar;
+
 
 	/* read, which parameters shall be used */
 	fp1 = fopen_r ("parameters/orient.par");
@@ -337,10 +337,7 @@ void orient (Tcl_Interp* interp, Exterior Ex0, Interior I0, Glass G0, ap_52 ap0,
 
 	//if(multi==0){
 	read_image (interp, img_name[nr], img[nr]);
-	// sprintf(val, "newimage %d", nr+1);			// replaced, ad holten 04-2013
-	get_tclzoomparms(interp, &zoompar, nr+1);
-	sprintf(val, "newimage %d %f %f %d %d", nr+1,
-		zoompar.xc, zoompar.yc, zoompar.fac, zoompar.fixed);
+	sprintf(val, "newimage %d", nr+1);
 	Tcl_Eval(interp, val);
 	//}
 
@@ -1193,7 +1190,7 @@ void orient_v3 (Tcl_Interp* interp, Exterior Ex0, Interior I0, Glass G0, ap_52 a
 	FILE	*fp1;
 	int 	dummy, multi,numbers;
 	double	al,be,ga,nGl,e1_x,e1_y,e1_z,e2_x,e2_y,e2_z,n1,n2,safety_x,safety_y,safety_z;
-	Zoompar zoompar;
+
 
 	/* read, which parameters shall be used */
 	fp1 = fopen_rp ("parameters/orient.par");		// replaced fopen_r(), ad holten 12-2012
@@ -1557,11 +1554,7 @@ void orient_v3 (Tcl_Interp* interp, Exterior Ex0, Interior I0, Glass G0, ap_52 a
 
 	//if(multi==0){
 	read_image (interp, img_name[nr], img[nr]);
-	// sprintf(val, "newimage %d", nr+1);			// replaced, ad holten 04-2013
-	get_tclzoomparms(interp, &zoompar, nr+1);
-	sprintf(val, "newimage %d %f %f %d %d", nr+1,
-		zoompar.xc, zoompar.yc, zoompar.fac, zoompar.fixed);
-
+	sprintf(val, "newimage %d", nr+1);
 	Tcl_Eval(interp, val);
 	//}
 
@@ -1622,7 +1615,7 @@ void orient_v6 (Tcl_Interp* interp, Exterior Ex0, Interior I0, Glass G0, ap_52 a
 	FILE	*fp1;
 	int 	dummy, multi,numbers;
 	double	al,be,ga,nGl,e1_x,e1_y,e1_z,e2_x,e2_y,e2_z,n1,n2,safety_x,safety_y,safety_z;
-	Zoompar	zoompar;
+
 
 	/* read, which parameters shall be used */
 	fp1 = fopen_rp ("parameters/orient.par");		// replaced fopen_r(), ad holten, 12-2012
@@ -1992,10 +1985,7 @@ void orient_v6 (Tcl_Interp* interp, Exterior Ex0, Interior I0, Glass G0, ap_52 a
 
 	//if(multi==0){
 	read_image (interp, img_name[nr], img[nr]);
-	// sprintf(val, "newimage %d", nr+1);			// replaced, ad holten 04-2013
-	get_tclzoomparms(interp, &zoompar, nr);
-	sprintf(val, "newimage %d %f %f %d %d", nr+1,
-		zoompar.xc, zoompar.yc, zoompar.fac, zoompar.fixed);
+	sprintf(val, "newimage %d", nr+1);
 	Tcl_Eval(interp, val);
 	//}
 
@@ -2052,7 +2042,7 @@ void raw_orient (Exterior Ex0, Interior I, Glass G, ap_52 ap, mm_np mm,
 
 	///////////make a menu so one see the raw guess!!!!!
 	if (only_show == 1) stopflag = 1;
-	/////// Beat Lüthi 9. Mai 2007
+	/////// Beat LÂ¸thi 9. Mai 2007
 
 	while (stopflag == 0 && itnum < 20)
 	{
@@ -2164,7 +2154,7 @@ void raw_orient_v3 (Exterior Ex0, Interior I, Glass G0, ap_52 ap, mm_np mm, int 
 
 	///////////make a menu so one see the raw guess!!!!!
 	if(only_show==1) stopflag=1;
-	/////// Beat Lüthi 9. Mai 2007
+	/////// Beat LÂ¸thi 9. Mai 2007
 
 	while (stopflag == 0 && itnum < 20)
 	{
@@ -2278,7 +2268,7 @@ void raw_orient_v3 (Exterior Ex0, Interior I, Glass G0, ap_52 ap, mm_np mm, int 
 void raw_orient_v4 (Exterior Ex0[4], Interior I[4], Glass G0[4], ap_52 ap[4], mm_np mm, int nfix,
 					coord_3d fix[], coord_2d crd[4][12], Exterior Ex[4], int only_show)
 // Beat Nov 2008 to have calibration without knowing coord of target points
-// Beat Lüthi, Nov 2008
+// Beat LÂ¸thi, Nov 2008
 {
 	double	X[30][6], y[30], XPX[6][6], XPy[6], beta[6];
 	double	Xp, Yp, Zp, xp, yp, xpd, ypd;
@@ -2304,7 +2294,7 @@ void raw_orient_v4 (Exterior Ex0[4], Interior I[4], Glass G0[4], ap_52 ap[4], mm
 
 	///////////make a menu so one see the raw guess!!!!!
 	if(only_show==1) stopflag=1;
-	/////// Beat Lüthi 9. Mai 2007
+	/////// Beat LÂ¸thi 9. Mai 2007
 
 	while (stopflag == 0 && itnum < 6000000)
 	{
@@ -2455,7 +2445,7 @@ void raw_orient_v4 (Exterior Ex0[4], Interior I[4], Glass G0[4], ap_52 ap[4], mm
 void raw_orient_v5 (Exterior Ex0[4], Interior I[4], Glass G0[4], ap_52 ap[4], mm_np mm, int nfix,
 					coord_3d fix[], coord_2d crd[4][12], Exterior Ex[4], int only_show)
 //Beat Nov 2008 to have calibration without knowing coord of target points
-//Beat Lüthi, Nov 2008
+//Beat LÂ¸thi, Nov 2008
 {
 	double	X[30][6], y[30], XPX[6][6], XPy[6], beta[6];
 	double	Xp, Yp, Zp, dist;
@@ -2475,7 +2465,7 @@ void raw_orient_v5 (Exterior Ex0[4], Interior I[4], Glass G0[4], ap_52 ap[4], mm
 
 	///////////make a menu so one see the raw guess!!!!!
 	if(only_show==1) stopflag=1;
-	/////// Beat Lüthi 9. Mai 2007
+	/////// Beat LÂ¸thi 9. Mai 2007
 
 	while (stopflag == 0 && itnum < 6000000)
 	{

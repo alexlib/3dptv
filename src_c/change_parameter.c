@@ -3,8 +3,8 @@
   Author/Copyright: 	Jochen Willneff
   
   Address:				Institute of Geodesy and Photogrammetry
-						ETH - Hoenggerberg
-						CH - 8093 Zurich
+					ETH - Hoenggerberg
+					CH - 8093 Zurich
   
   Creation Date:		October'97	   
   
@@ -24,7 +24,7 @@ See the file license.txt for copying permission.
 #include "ptv.h"
 
 /********************************************************************/
-/* parameter_panel_init : initializes the parameter panel */
+/* parameter_panel_init : initializes the parameter panel           */
 /********************************************************************/
 
 int parameter_panel_init(Tcl_Interp* interp)

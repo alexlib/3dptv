@@ -13,6 +13,7 @@ Creation Date:	  1988/89
 Description:	  establishment of correspondences for 2/3/4 cameras
 
 ****************************************************************************/
+
 /*
 Copyright (c) 1990-2011 ETH Zurich
 
@@ -39,7 +40,6 @@ void correspondences_4 (Tcl_Interp* interp, const char** argv)
 	candidate  cand[maxcand];
 	n_tupel    *con0;
 	correspond *list[4][4];
-	Zoompar zoompar[4];
 	/* ----------------------------------------------------------------------- */
 
 	/* allocate memory for lists of correspondences */
@@ -76,7 +76,7 @@ void correspondences_4 (Tcl_Interp* interp, const char** argv)
 		for (j=0; j<4; j++) tim[j][i] = 0;
 	}
 
-	/* ------- if only one cam and 2D ------- */ //by Beat Lüthi June 2007
+	/* ------- if only one cam and 2D ------- */ //by Beat LÂ¸thi June 2007
 	if (n_img==1) {
 		if (res_name[0]==0)
 			sprintf (res_name, "rt_is");
@@ -387,44 +387,53 @@ void correspondences_4 (Tcl_Interp* interp, const char** argv)
 					pix[j][p1].tnr = i;
 			}
 		
-			
+
 	/* draw crosses on canvas */
 	if (display) {
-		clear_drawnobjectslist();
-		for (i=0; i<n_img; i++)
-			get_tclzoomparms(interp, &zoompar[i], i);
-
-		//for (i=0; i<4; i++) {
-		//	zfac[i] = zoom_f[i];
-		//	if (zoom_f[i]<0) zoom_f[i] = 1;
-		//}
 		for (i=0; i<match4; i++) {		  /* red crosses for quadruplets */
 			for (j=0; j<n_img; j++) {
 				p1 = geo[j][con[i].p[j]].pnr;
-				if (p1 > -1 && isinview(pix[j][p1].x, pix[j][p1].y, j)) {
-					img_to_view_coordinates(&intx, &inty, pix[j][p1].x, pix[j][p1].y, j);
-					drawcross (interp, intx, inty, cr_sz, j, "red");
-					draw_pnr_autohide (interp, intx+5 , inty+0, i, j, "white", 2, zoompar[j].fac);
+				if (p1 > -1) {
+					if (   (fabs(pix[j][p1].x-zoom_x[j]) < imx/(2*zoom_f[j]))
+						&& (fabs(pix[j][p1].y-zoom_y[j]) < imy/(2*zoom_f[j])))
+					{
+						intx = (int) (imx/2 + zoom_f[j] * (pix[j][p1].x-zoom_x[j]));
+						inty = (int) (imy/2 + zoom_f[j] * (pix[j][p1].y-zoom_y[j]));
+						drawcross (interp, intx, inty, cr_sz, j, "red");
+						if (zoom_f[j]>=2) draw_pnr (interp, intx+5 , inty+0, i, j, "white");
+					}
 				}
 			}
 		}
+
 		for (i=match4; i<match4+match3; i++) {	 /* green crosses for triplets */
 			for (j=0; j<n_img; j++) {
 				p1 = geo[j][con[i].p[j]].pnr;
-				if (p1 > -1 && con[i].p[j] > -1 && isinview(pix[j][p1].x, pix[j][p1].y, j)) {
-					img_to_view_coordinates(&intx, &inty, pix[j][p1].x, pix[j][p1].y, j);
-					drawcross (interp, intx, inty, cr_sz, j, "green" );
-					draw_pnr_autohide (interp, intx+5 , inty+0, i, j, "white", 2, zoompar[j].fac);
+				if (p1 > -1 && con[i].p[j] > -1) {
+					if (   (fabs(pix[j][p1].x-zoom_x[j]) < imx/(2*zoom_f[j]))
+						&& (fabs(pix[j][p1].y-zoom_y[j]) < imy/(2*zoom_f[j])))
+					{
+						intx = (int) (imx/2 + zoom_f[j] * (pix[j][p1].x-zoom_x[j]));
+						inty = (int) (imy/2 + zoom_f[j] * (pix[j][p1].y-zoom_y[j]));
+						drawcross ( interp, intx, inty, cr_sz, j, "green" );
+						if (zoom_f[j]>=2) draw_pnr (interp, intx+5 , inty+0, i, j, "white");/* number of triplet */
+					}
 				}
 			}
 		}
-		for (i=match4+match3; i<match4+match3+match2; i++) {	/* yellow crosses for pairs */
+		for (i=match4+match3; i<match4+match3+match2; i++) {
+			/* yellow crosses for pairs */
 			for (j=0; j<n_img; j++) {
 				p1 = geo[j][con[i].p[j]].pnr;
-				if (p1 > -1 && con[i].p[j] > -1 && isinview(pix[j][p1].x, pix[j][p1].y, j)) {
-					img_to_view_coordinates(&intx, &inty, pix[j][p1].x, pix[j][p1].y, j);
-					drawcross (interp, intx, inty, cr_sz, j, "yellow");
-					draw_pnr_autohide (interp, intx+5 , inty+0, i, j, "white", 2, zoompar[j].fac);
+				if (p1 > -1 && con[i].p[j] > -1) {
+					if (   (fabs(pix[j][p1].x-zoom_x[j]) < imx/(2*zoom_f[j]))
+						&& (fabs(pix[j][p1].y-zoom_y[j]) < imy/(2*zoom_f[j])))
+					{
+						intx = (int) (imx/2 + zoom_f[j] * (pix[j][p1].x-zoom_x[j]));
+						inty = (int) (imy/2 + zoom_f[j] * (pix[j][p1].y-zoom_y[j]));
+						drawcross (interp, intx, inty, cr_sz, j, "yellow");
+						if (zoom_f[j]>=2) draw_pnr (interp, intx+5 , inty+0, i, j, "white"); /* number of triplet */
+					}
 				}
 			}
 		}
@@ -432,14 +441,17 @@ void correspondences_4 (Tcl_Interp* interp, const char** argv)
 		for (j=0; j<n_img; j++) {
 			for (i=0; i<num[j]; i++) {	/* blue crosses for unused detections */
 				p1 = pix[j][i].tnr;
-				if (p1 == -1 && isinview(pix[j][i].x, pix[j][i].y, j)) {
-					img_to_view_coordinates(&intx, &inty, pix[j][i].x, pix[j][i].y, j);
-					drawcross (interp, intx, inty, cr_sz, j, "blue");
+				if (p1 == -1) {
+					if (   (fabs(pix[j][i].x-zoom_x[j]) < imx/(2*zoom_f[j]))
+						&& (fabs(pix[j][i].y-zoom_y[j]) < imy/(2*zoom_f[j])))
+					{
+						intx = (int) (imx/2 + zoom_f[j] * (pix[j][i].x-zoom_x[j]));
+						inty = (int) (imy/2 + zoom_f[j] * (pix[j][i].y-zoom_y[j]));
+						drawcross (interp, intx, inty, cr_sz, j, "blue");
+					}
 				}
 			}
 		}
-		// for (i=0; i<4; i++)
-		//	 zoom_f[i] = zfac[i];
 	}
 	/* ----------------------------------------------------------------------- */
 	/* free memory for lists of correspondences */
@@ -454,4 +466,3 @@ void correspondences_4 (Tcl_Interp* interp, const char** argv)
 	Tcl_Eval(interp, ".text delete 2");
 	Tcl_Eval(interp, ".text insert 2 $tbuf");
 }
-

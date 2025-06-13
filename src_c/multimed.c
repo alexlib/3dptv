@@ -260,7 +260,7 @@ void  multimed_nlay (Exterior ex, mm_np mm,
 void  multimed_nlay_v2 (Exterior ex, Exterior ex_o, mm_np mm,
 						double X, double Y, double Z, double  *Xq, double *Yq)
 {
-	// Beat Lüthi, Nov 2007 comment actually only Xq is affected since all Y and Yq are always zero
+	// Beat LÂ¸thi, Nov 2007 comment actually only Xq is affected since all Y and Yq are always zero
 	int    i, it=0;
 	double beta1, beta2[32], beta3, r, rbeta, rdiff, rq, mmf;
 
@@ -316,7 +316,7 @@ void  multimed_nlay_v2 (Exterior ex, Exterior ex_o, mm_np mm,
 	//-----------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------
 
-	//Beat Lüthi, Nov 2007, I will implement the Risö method to avoid all this sin, atan etc
+	//Beat LÂ¸thi, Nov 2007, I will implement the RisË† method to avoid all this sin, atan etc
   
 	/*double absError=100;
 	int counter=0;
@@ -429,7 +429,7 @@ double multimed_r_nlay (Exterior ex, mm_np mm, double X, double Y, double Z)
 	//-----------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------
 
-	//Beat Lüthi, Nov 2007, I will implement the Risö method to avoid all this sin, atan etc
+	//Beat LÂ¸thi, Nov 2007, I will implement the RisË† method to avoid all this sin, atan etc
 
 	/*
 	while(absError>0.00001 && counter<40){	  
@@ -488,7 +488,7 @@ void trans_Cam_Point_back(Exterior ex, mm_np mm, Glass gl, double X, double Y, d
 						  Exterior *ex_t, double *X_t, double *Y_t, double *Z_t, 
 						  double *cross_p, double *cross_c)
 {
-	//--Beat Lüthi June 07: I change the stuff to a system perpendicular to the interface
+	//--Beat LÂ¸thi June 07: I change the stuff to a system perpendicular to the interface
 	double dummy;
 	double nGl;
 
@@ -519,7 +519,7 @@ void trans_Cam_Point(Exterior ex, mm_np mm, Glass gl, double X, double Y, double
 					 Exterior *ex_t, double *X_t, double *Y_t, double *Z_t, 
 					 double *cross_p, double *cross_c)
 {
-	//--Beat Lüthi June 07: I change the stuff to a system perpendicular to the interface
+	//--Beat LÂ¸thi June 07: I change the stuff to a system perpendicular to the interface
 	double dist_cam_glas,dist_point_glas,dist_o_glas; //glas inside at water 
 
 	dist_o_glas=sqrt(gl.vec_x*gl.vec_x+gl.vec_y*gl.vec_y+gl.vec_z*gl.vec_z);
@@ -623,7 +623,7 @@ double multimed_r_nlay_v2 (Exterior ex, Exterior ex_o, mm_np mm,
 	//-----------------------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------------------
 
-	//Beat Lüthi, Nov 2007, I will implement the Risö method to avoid all this sin, atan etc
+	//Beat LÂ¸thi, Nov 2007, I will implement the RisË† method to avoid all this sin, atan etc
 	/*
 
 	while(absError>0.00001 && counter<40){	  
@@ -665,7 +665,7 @@ void init_mmLUT (int i_cam)
 	register int i,j, nr, nz;
 	double		 X,Y,Z, R, X1,Y1,Z1, Zmin, Rmax=0,Zmax, a,b,c;
 	double		 x,y, *Ri,*Zi;
-	double		 rw = 2; //was 2, has unit [mm]??, Beat Lüthi Aug 1, 2007, is ok
+	double		 rw = 2; //was 2, has unit [mm]??, Beat LÂ¸thi Aug 1, 2007, is ok
 	Exterior	 Ex_t[4];
 	double		 X_t,Y_t,Z_t,cross_p[3],cross_c[3],Zmin_t,Zmax_t;
 
@@ -817,8 +817,6 @@ void init_mmLUT (int i_cam)
 	mmLUT[i_cam].nr = nr;
 	mmLUT[i_cam].nz = nz;
 	mmLUT[i_cam].rw = rw;
-	if (mmLUT[i_cam].data != NULL)			// preventing memory leaks, ad holten, 04-2013
-		free (mmLUT[i_cam].data);
 	mmLUT[i_cam].data = (double *) malloc (nr*nz * sizeof (double));
 
 	/* fill mmLUT structure */
@@ -841,8 +839,6 @@ void init_mmLUT (int i_cam)
 			multimed_r_nlay_v2 (Ex_t[i_cam], Ex[i_cam], mmp, 
 								Ri[i]+Ex_t[i_cam].x0, Ex_t[i_cam].y0, Zi[j]);
 	}
-	free (Ri);	// preventing memory leaks, ad holten, 04-2013
-	free (Zi);
 }
 
 double get_mmf_from_mmLUT (int i_cam, double X, double Y, double Z)

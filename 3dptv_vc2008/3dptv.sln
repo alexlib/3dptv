@@ -1,7 +1,6 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3dptv_vc2008", "3dptv_vc2008\3dptv.vcproj", "{E00A7987-43D3-401E-B02B-3E80F54CD7F7}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3dptv_vc2008", "3dptv_vc2008\3dptv.vcxproj", "{E00A7987-43D3-401E-B02B-3E80F54CD7F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
