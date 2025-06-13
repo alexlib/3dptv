@@ -393,24 +393,24 @@ BOOL get_tclzoomparms(Tcl_Interp *interp, Zoompar *zoompar, int i_img) {
   char val[256];
   int ic = i_img + 1;
 
-  sprintf(val, "get_viewsize %d", ic);
+  snprintf(val, sizeof(val), "get_viewsize %d", ic);
   Tcl_Eval(interp, val);
-  sprintf(val, "xc%d", ic);
+  snprintf(val, sizeof(val), "xc%d", ic);
   zoompar->xc = atof(Tcl_GetVar2(interp, "zoom", val, TCL_GLOBAL_ONLY));
 
-  sprintf(val, "yc%d", ic);
+  snprintf(val, sizeof(val), "yc%d", ic);
   zoompar->yc = atof(Tcl_GetVar2(interp, "zoom", val, TCL_GLOBAL_ONLY));
 
-  sprintf(val, "vwx%d", ic);
+  snprintf(val, sizeof(val), "vwx%d", ic);
   zoompar->vwx = atoi(Tcl_GetVar2(interp, "zoom", val, TCL_GLOBAL_ONLY));
 
-  sprintf(val, "vwy%d", ic);
+  snprintf(val, sizeof(val), "vwy%d", ic);
   zoompar->vwy = atoi(Tcl_GetVar2(interp, "zoom", val, TCL_GLOBAL_ONLY));
 
-  sprintf(val, "fac%d", ic);
+  snprintf(val, sizeof(val), "fac%d", ic);
   zoompar->fac = atoi(Tcl_GetVar2(interp, "zoom", val, TCL_GLOBAL_ONLY));
 
-  sprintf(val, "fixed%d", ic);
+  snprintf(val, sizeof(val), "fixed%d", ic);
   zoompar->fixed = atoi(Tcl_GetVar2(interp, "zoom", val, TCL_GLOBAL_ONLY));
   return TRUE;
 }

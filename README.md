@@ -66,3 +66,29 @@
 
 		cd 3dptv/test
 		../build/bin/3dptv ../ptv.tcl
+
+
+8. Debugging:
+
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
+	cd build
+	rm -rf CMakeCache.txt CMakeFiles/
+	cmake ..
+	make
+
+
+	cd ../test
+	gdb ../build/bin/3dptv
+	(gdb) set args ../ptv.tcl
+
+	(gdb) run
+
+	After the segfault
+	(gdb) bt
+
+	(gdb) frame <frame_number_from_bt>
+	(gdb) print <variable_name>
+	(gdb) info locals  # Shows local variables in the current frame
+	(gdb) info args    # Shows function arguments in the current frame

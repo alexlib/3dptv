@@ -1118,8 +1118,8 @@ void orient_v3(Tcl_Interp *interp, Exterior Ex0, Interior I0, Glass G0,
   read_image(interp, img_name[nr], img[nr]);
   // sprintf(val, "newimage %d", nr+1);            // replaced, ad holten
   // 04-2013
-  get_tclzoomparms(interp, &zoompar, nr + 1);
-  sprintf(val, "newimage %d %f %f %d %d", nr + 1, zoompar.xc, zoompar.yc,
+  get_tclzoomparms(interp, &zoompar, nr);
+  sprintf(val, "newimage %d %f %f %d %d", nr, zoompar.xc, zoompar.yc,
           zoompar.fac, zoompar.fixed);
 
   Tcl_Eval(interp, val);

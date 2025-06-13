@@ -36,4 +36,11 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
 message(STATUS "gathering ptv tcl files:")
 file(GLOB ptv_tcl "${CMAKE_SOURCE_DIR}/src_tcl/*.tcl")
 
+# Option 1: Set build type (recommended for overall debug build)
+# When running cmake, use: cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+# Option 2: Add -g flag directly (can be combined with build type)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g") # If you have C++ code
+
 add_subdirectory("${CMAKE_SOURCE_DIR}/src_c")
