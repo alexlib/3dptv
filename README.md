@@ -22,6 +22,7 @@
  	
 		sudo apt-get install build-essential
 		sudo apt-get install libtiff-dev
+		sudo apt install tcl-dev tk-dev tklib
 	
 	-- on Mac OS X is recommended to install libtiff using Homebrew:
 

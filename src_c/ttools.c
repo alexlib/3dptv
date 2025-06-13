@@ -16,6 +16,7 @@ Routines contained: 	pix_in_next, candsearch_in_pix, searchposition,
 
 ****************************************************************************/
 #include "ptv.h"
+#include <math.h>
 
 #ifdef EVER_CALLED		// Unused function, ad holten 12-2012
 int pix_in_next (target next[], int num, double x, double y, 

@@ -439,7 +439,7 @@ void read_ascii_datanew(int filenumber)
 	//	}
 
 	fscanf(FILEIN, "%*d\n");
-	for(i=0; i<=m[3]; i++)		/* read dataset row by row */
+	for(i=0; i<m[3]; i++)		/* read dataset row by row */
 		fscanf(FILEIN, "%*d %*d %*lf %*lf %*lf %d\n", &mega[3][i].prio);
 	fclose(FILEIN);
 

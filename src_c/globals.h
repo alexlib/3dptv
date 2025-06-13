@@ -1,4 +1,18 @@
 /*  global declarations for ptv  */
+#ifndef CUSTOM_BOOL_DEFINED
+#define CUSTOM_BOOL_DEFINED
+#include <stdbool.h> // Provides bool, true, false
+typedef bool BOOL;   // Typedef BOOL from the standard bool
+// TRUE and FALSE macros might still be needed if the code uses them
+// instead of true and false.
+#ifndef TRUE
+#define TRUE true
+#endif
+#ifndef FALSE
+#define FALSE false
+#endif
+#endif // CUSTOM_BOOL_DEFINED
+
 
 #define nmax 20240
 
@@ -314,3 +328,5 @@ void  searchquader(double X, double Y, double Z,
 void  sortwhatfound (foundpix item[16], int *zaehler);
 void  angle_acc(double X0, double Y0, double Z0, double X1, double Y1, double Z1, 
 			   double X2, double Y2, double Z2, double *angle, double *acc);
+
+

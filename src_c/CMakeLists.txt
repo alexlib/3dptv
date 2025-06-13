@@ -59,6 +59,7 @@ source_group("Source Files" FILES ${ptv_srcs})
 source_group("Tcl Files" FILES ${ptv_tcl})
 
 add_executable(${TARGET_NAME} ${ptv_srcs} ${ptv_hdrs} ${ptv_tcl} )
+target_compile_definitions(${TARGET_NAME} PRIVATE _SVID_SOURCE)
 
 if(WIN32)
   set_target_properties(${TARGET_NAME} PROPERTIES LINKER_LANGUAGE C)  
@@ -66,4 +67,4 @@ if(WIN32)
 endif()
 
 set(EXTRA_LIBS ${EXTRA_LIBS} ${TCL_LIBRARY} ${TK_LIBRARY} ${TIFF_LIBRARY})
-target_link_libraries(${TARGET_NAME} ${EXTRA_LIBS} )
+target_link_libraries(${TARGET_NAME} ${EXTRA_LIBS} m)

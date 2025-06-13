@@ -12,10 +12,10 @@
  * Sun shared libraries to be used for Tcl.
  */
 
-extern int matherr();
-int *tclDummyMathPtr = (int *) matherr;
-
-#ifdef TK_TEST
+ // extern int matherr();
+ // int *tclDummyMathPtr = (int *) matherr;
+ 
+ #ifdef TK_TEST
 EXTERN int	Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 #endif
 
