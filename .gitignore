@@ -10,3 +10,6 @@ ipch/
 build/
 .clang-format
 .vscode/c_cpp_properties.json
+test/img/*
+test/cal/*
+test/res/*

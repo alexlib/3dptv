@@ -143,20 +143,39 @@ int jw_Init(Tcl_Interp *interp) {
 
   Tcl_CreateCommand(interp, "restore_cmd", restore_proc_c, (ClientData)NULL,
                     (Tcl_CmdDeleteProc *)NULL);
-  Tcl_CreateCommand(interp, "quit_proc", quit_proc_c, (ClientData)NULL,
+
+  Tcl_CreateCommand(interp, "mouse_cmd", mouse_proc_c, (ClientData)NULL,
                     (Tcl_CmdDeleteProc *)NULL);
-  Tcl_CreateObjCommand(interp, "flow_cmd", flow_demo_c, (ClientData)NULL,
+
+  Tcl_CreateCommand(interp, "flow_cmd", flow_demo_c, (ClientData)NULL,
                     (Tcl_CmdDeleteProc *)NULL);
 
-  /* register new image format TIF */
+  Tcl_CreateCommand(interp, "marktrack_cmd", mark_track_c, (ClientData)NULL,
+                    (Tcl_CmdDeleteProc *)NULL);
 
-  /*
-   * Specify a user-specific startup file to invoke if the application
-   * is run interactively.  Typically the startup file is "~/.apprc"
-   * where "app" is the name of the application.	If this line is deleted
-   * then no user-specific startup file will be run under any conditions.
-   */
+  Tcl_CreateCommand(interp, "trackcorr_cmd", trackcorr_c, (ClientData)NULL,
+                    (Tcl_CmdDeleteProc *)NULL);
 
-  Tcl_SetVar(interp, "tcl_rcFileName", "~/.jwshrc", TCL_GLOBAL_ONLY);
+  Tcl_CreateCommand(interp, "trackback_cmd", trackback_c, (ClientData)NULL,
+                    (Tcl_CmdDeleteProc *)NULL);
+
+  Tcl_CreateCommand(interp, "trajectories_cmd", trajectories_c,
+                    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+
+//   Tcl_CreateCommand(interp, "VRMLtracks", vrmltracks_c, (ClientData)NULL,
+//                     (Tcl_CmdDeleteProc *)NULL);
+
+  Tcl_CreateCommand(interp, "VRMLdetections", vrmldetections_c,
+                    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+
+  Tcl_CreateCommand(interp, "VRMLdettracks", vrmldettracks_c, (ClientData)NULL,
+                    (Tcl_CmdDeleteProc *)NULL);
+
+  Tcl_CreateCommand(interp, "ptv_cmd", seq_track_proc_c, (ClientData)NULL,
+                    (Tcl_CmdDeleteProc *)NULL);
+
+  Tcl_CreateCommand(interp, "clear_cmd", clearmarkers_c, (ClientData)NULL,
+                    (Tcl_CmdDeleteProc *)NULL);
+
   return TCL_OK;
 }

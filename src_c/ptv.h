@@ -33,7 +33,7 @@ extern Tcl_CmdProc calibration_proc_c;
 extern Tcl_CmdProc restore_proc_c;
 extern Tcl_CmdProc quit_proc_c;
 extern Tcl_CmdProc mouse_proc_c;
-extern int flow_demo_c(ClientData clientData, Tcl_Interp* interp, int objc, Tcl_Obj *CONST objv[]);
+extern Tcl_CmdProc flow_demo_c;
 extern Tcl_CmdProc mark_track_c;
 extern Tcl_CmdProc trackcorr_c;
 extern Tcl_CmdProc trackback_c;
