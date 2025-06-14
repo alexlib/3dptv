@@ -1114,26 +1114,26 @@ void orient_v3(Tcl_Interp *interp, Exterior Ex0, Interior I0, Glass G0,
   snprintf(val, sizeof(val), "%d: %5.2f micron, ", nr + 1, sigma0 * 1000);
   strncat(buf, val, sizeof(buf) - strlen(buf) - 1);
 
-  // if(multi==0){
-  read_image(interp, img_name[nr], img[nr]);
-  // sprintf(val, "newimage %d", nr+1);            // replaced, ad holten
-  // 04-2013
-  get_tclzoomparms(interp, &zoompar, nr);
-  sprintf(val, "newimage %d %f %f %d %d", nr, zoompar.xc, zoompar.yc,
-          zoompar.fac, zoompar.fixed);
-  puts(val);  // debugging output
-  Tcl_Eval(interp, val);
-  //}
+  // // if(multi==0){
+  // read_image(interp, img_name[nr], img[nr]);
+  // // sprintf(val, "newimage %d", nr+1);            // replaced, ad holten
+  // // 04-2013
+  // get_tclzoomparms(interp, &zoompar, nr);
+  // snprintf(val, sizeof(val), "newimage %d %f %f %d %d", nr, zoompar.xc, zoompar.yc,
+  //          zoompar.fac, zoompar.fixed);
+  // puts(val);  // debugging output
+  // Tcl_Eval(interp, val);
+  // //}
 
   puts(buf);
 
   // if(multi==0){
   for (i = 0; i < n_obs - 10; i += 2) {
-    n = (int)pixnr[i / 2];
-    intx1 = (int)pix[nr][n].x;
-    inty1 = (int)pix[nr][n].y;
-    intx2 = (int)(intx1 + resi[i] * 5000);
-    inty2 = (int)(inty1 + resi[i + 1] * 5000);
+    n = (int)pixnr[i / 2];  // NOLINT
+    intx1 = (int)pix[nr][n].x;  // NOLINT
+    inty1 = (int)pix[nr][n].y;  // NOLINT
+    intx2 = (int)(intx1 + resi[i] * 5000);  // NOLINT
+    inty2 = (int)(inty1 + resi[i + 1] * 5000);  // NOLINT
 
     drawcross(interp, intx1, inty1, 3, nr, "orange");
     drawvector(interp, intx1, inty1, intx2, inty2, 1, nr, "red");

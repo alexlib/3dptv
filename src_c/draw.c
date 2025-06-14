@@ -92,7 +92,7 @@ void add_oval(int x0, int y0, int size, int imgnr, char *color) {
   pm->y = y0;
   pm->size = size;
   pm->type = OBJ_OVAL;
-  strcpy(pm->color, color);
+  snprintf(pm->color, sizeof(pm->color), "%s", color);
   nmarkers[imgnr]++;
 }
 
@@ -107,7 +107,7 @@ void add_pnr(int x, int y, int pnr, int imgnr, char *color, int minzoomlevel) {
   pm->size = pnr;
   pm->minzoom = minzoomlevel;
   pm->type = OBJ_PNR;
-  strcpy(pm->color, color);
+  snprintf(pm->color, sizeof(pm->color), "%s", color);
   nmarkers[imgnr]++;
 }
 
@@ -123,7 +123,7 @@ void add_value(int x, int y, double value, int imgnr, char *color,
   pm->value = value;
   pm->minzoom = minzoomlevel;
   pm->type = OBJ_VALUE;
-  strcpy(pm->color, color);
+  snprintf(pm->color, sizeof(pm->color), "%s", color);
   nmarkers[imgnr]++;
 }
 
@@ -140,7 +140,7 @@ void add_vector(int imgnr, int x0, int y0, int x1, int y1, int width,
   pm->y1 = y1;
   pm->size = width;
   pm->type = OBJ_VECTOR;
-  strcpy(pm->color, color);
+  snprintf(pm->color, sizeof(pm->color), "%s", color);
   nmarkers[imgnr]++;
 }
 
@@ -217,11 +217,11 @@ int drawcross(Tcl_Interp *interp, int x0, int y0, int size, int imgnr,
 int drawoval(Tcl_Interp *interp, int x0, int y0, int size, int imgnr,
              char color[]) {
   char val[256];
-  if (!skip_adding) // add cross to the objects to be redrawn
+  if (!skip_adding)  // add cross to the objects to be redrawn
     add_oval(x0, y0, size, imgnr, color);
 
-  img_to_view_coordinates(&x0, &y0, (double)x0, (double)y0, imgnr);
-  sprintf(val, "draw_oval %d %d %d %d %s", x0, y0, size, imgnr + 1, color);
+  img_to_view_coordinates(&x0, &y0, (double)x0, (double)y0, imgnr);  // NOLINT
+  snprintf(val, sizeof(val), "draw_oval %d %d %d %d %s", x0, y0, size, imgnr + 1, color);
   Tcl_Eval(interp, val);
   return TCL_OK;
 }
@@ -230,14 +230,13 @@ int drawvector(Tcl_Interp *interp, int x0, int y0, int x1, int y1, int width,
                int imgnr, char color[]) {
   char val[256];
   // printf("skip_adding = %d\n", skip_adding);
-  if (!skip_adding)  // add vector to the objects to be redrawn
-    add_vector(imgnr, x0, y0, x1, y1, width, color);
+  // if (!skip_adding)  // add vector to the objects to be redrawn
+  //   add_vector(imgnr, x0, y0, x1, y1, width, color);
 
   img_to_view_coordinates(&x0, &y0, (double)x0, (double)y0, imgnr);  // NOLINT
   img_to_view_coordinates(&x1, &y1, (double)x1, (double)y1, imgnr);  // NOLINT
   snprintf(val, sizeof(val), "drawline %d %d %d %d %d %d %s", x0, y0, x1, y1, width,
-          imgnr, color);  // debugging i change here val for Tcl_Eval
-  // puts(val);  // Debugging output
+          imgnr + 1, color);
   Tcl_Eval(interp, val);
   return TCL_OK;
 }

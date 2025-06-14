@@ -531,11 +531,11 @@ int detection_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       Tcl_Eval(interp, val);
     }
   }
-  strcpy(val, "");
+  val[0] = '\0';
 
   xmin = 0;
 
-  /*	read pft version  */
+  /*  read pft version  */
   fpp = fopen("parameters/pft_version.par", "r");
   if (fpp) {
     fscanf(fpp, "%d\n", &pft_version);
@@ -1415,15 +1415,10 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   case 2:
     puts("Detection procedure");
-    strcpy(val, "");
+    val[0] = '\0';
 
     /* Highpass Filtering */
     pre_processing_c(clientData, interp, argc, argv);
-
-    ///* reset zoom values */
-    // for (i=0; i<n_img; i++) {
-    //	zoom_x[i] = imx/2; zoom_y[i] = imy/2; zoom_f[i] = 1;
-    //}
 
     /* copy images because the target recognition will set greyvalues to zero */
     for (i = 0; i < n_img; i++)
@@ -1434,8 +1429,8 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       targ_rec(interp, img[i], img0[i], "parameters/detect_plate.par", 0, imx,
                1, imy, pix[i], i, &num[i]);
 
-      sprintf(buf, "image %d: %d,  ", i + 1, num[i]);
-      strcat(val, buf);
+      snprintf(buf, sizeof(buf), "image %d: %d,  ", i + 1, num[i]);
+      snprintf(val + strlen(val), sizeof(val) - strlen(val), "%s", buf);
 
       if (num[i] > nmax) {
         printf("Aborted, too many targets detected!\n"); // ad holten, 12-2012
@@ -1449,14 +1444,14 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
         snprintf(filename, sizeof(filename), "%s_pix", img_name[i]);
         fp1 = fopen(filename, "w");
         for (j = 0; j < num[i]; j++)
-          fprintf(fp1, "%4d	%8.3f  %8.3f\n", pix[i][j].pnr, pix[i][j].x,
+          fprintf(fp1, "%4d  %8.3f  %8.3f\n", pix[i][j].pnr, pix[i][j].x,
                   pix[i][j].y);
 
         fclose(fp1);
       }
     }
 
-    sprintf(buf, "Number of detected targets, interaction enabled");
+    snprintf(buf, sizeof(buf), "Number of detected targets, interaction enabled");
     Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
     Tcl_Eval(interp, ".text delete 2");
     Tcl_Eval(interp, ".text insert 2 $tbuf");
@@ -1485,7 +1480,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     fclose(fp1);
 
     for (i = 0; i < n_img; i++) {
-      sprintf(val, "measure %d %d %d %d %d", nr[i][0], nr[i][1], nr[i][2],
+      snprintf(val, sizeof(val), "measure %d %d %d %d %d", nr[i][0], nr[i][1], nr[i][2],
               nr[i][3], i + 1);
       Tcl_Eval(interp, val);
       // replaced by a for loop, ad holten 12-2012
@@ -1506,9 +1501,9 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       // valp = Tcl_GetVar(interp, "py3",  TCL_GLOBAL_ONLY);
       // pix0[i][3].y = atoi (valp);
       for (j = 0; j < 4; j++) {
-        sprintf(val, "px%d", j);
+        snprintf(val, sizeof(val), "px%d", j);
         pix0[i][j].x = atoi(Tcl_GetVar(interp, val, TCL_GLOBAL_ONLY));
-        sprintf(val, "py%d", j);
+        snprintf(val, sizeof(val), "py%d", j);
         pix0[i][j].y = atoi(Tcl_GetVar(interp, val, TCL_GLOBAL_ONLY));
       }
     }
@@ -1526,7 +1521,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
     /* read point numbers of pre-clicked points */
     fp1 = fopen_rp(
-        "parameters/man_ori.par"); // replaced fopen_r, ad holten, 12-2012
+        "parameters/man_ori.par");  // replaced fopen_r, ad holten, 12-2012
     if (!fp1)
       break;
     for (i = 0; i < n_img; i++)
@@ -1534,15 +1529,15 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     fclose(fp1);
 
     /* read coordinates of pre-clicked points */
-    fp1 = fopen_rp("man_ori.dat"); // replaced fopen_r, ad holten, 12-2012
+    fp1 = fopen_rp("man_ori.dat");  // replaced fopen_r, ad holten, 12-2012
     if (!fp1)
       break;
     for (i_img = 0; i_img < n_img; i_img++)
-      for (i = 0; i < 4; i++) {
+      for (i = 0; i < n_img; i++) {
         fscanf(fp1, "%lf %lf\n", &pix0[i_img][i].x, &pix0[i_img][i].y);
-        drawcross(interp, (int)pix0[i_img][i].x, (int)pix0[i_img][i].y,
+        drawcross(interp, (int)pix0[i_img][i].x, (int)pix0[i_img][i].y,  // NOLINT
                   cr_sz + 2, i_img, "red");
-        draw_pnr(interp, (int)pix0[i_img][i].x, (int)pix0[i_img][i].y,
+        draw_pnr(interp, (int)pix0[i_img][i].x, (int)pix0[i_img][i].y,  // NOLINT
                  nr[i_img][i], i_img, "red");
       }
     fclose(fp1);
@@ -1553,7 +1548,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     puts("Sort grid points");
     for (i = 0; i < n_img; i++) {
       /* read control point coordinates for man_ori points */
-      fp1 = fopen_rp(fixp_name); // replaced fopen_r, ad holten, 12-2012
+      fp1 = fopen_rp(fixp_name);  // replaced fopen_r, ad holten, 12-2012
       if (!fp1)
         return TCL_OK;
       k = 0;
