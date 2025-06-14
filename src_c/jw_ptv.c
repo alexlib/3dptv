@@ -85,7 +85,7 @@ char safety_addpar[4][512];
 char img_addpar0[4][512];   /* ap approx. values */
 char seq_name[4][512];      /* sequence names */
 char img_mask_name[4][512]; /* mask image names*/
-char img_mask_path[512];
+char img_mask_path[500];
 char track_dir[512]; /* directory with dap track data */
 char fixp_name[512];
 char res_name[512];      /* result destination */

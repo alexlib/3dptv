@@ -11,6 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # - git: For version control (optional, but good to have)
 # - tcl-dev, tk-dev: For Tcl/Tk development (headers and libraries)
 # - libtiff-dev: For TIFF image support (headers and libraries)
+# - tklib, bwidget: For Tcl/Tk extensions (e.g., tooltip)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
@@ -19,11 +20,13 @@ RUN apt-get update && \
     tcl-dev \
     tk-dev \
     libtiff-dev \
+    tklib \
+    bwidget \
     # Clean up apt cache to reduce image size
     && rm -rf /var/lib/apt/lists/*
 
-# Set a working directory inside the container
-WORKDIR /3dptv_workspace
+# Create the application directory
+WORKDIR /opt/3dptv
 
 # Copy the entire project context into the WORKDIR
 COPY . .
@@ -35,8 +38,14 @@ RUN mkdir build && \
     cmake .. && \
     make
 
-# Default command to run when the container starts
-# This will drop you into a bash shell in the WORKDIR
-# The application is now pre-built
-CMD ["bash"]
+# Copy the entrypoint script and make it executable
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# Default command can be an empty array or a default path for the entrypoint
+# The entrypoint.sh script already defines a default working directory if none is provided.
+CMD []
 

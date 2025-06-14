@@ -1,126 +1,91 @@
 ## Running 3DPTV using Docker on Windows
 
-This guide explains how to use Docker to create a consistent Linux environment for building and running the 3DPTV application on a Windows host. This method avoids native compilation issues on Windows and ensures all dependencies are correctly managed.
+This guide explains how to use Docker to create a consistent Linux environment for running the 3DPTV application on a Windows host. The Docker image now includes the pre-built application and an entrypoint script for easier execution.
 
 ### Prerequisites
 
 1.  **Docker Desktop for Windows:**
     *   Download and install Docker Desktop from the [official Docker website](https://www.docker.com/products/docker-desktop).
-    *   Ensure Docker Desktop is running and configured to use the WSL 2 backend (recommended for performance) or Hyper-V.
+    *   Ensure Docker Desktop is running and configured to use the WSL 2 backend.
 
 2.  **X Server for Windows:**
-    *   To display the Tcl/Tk GUI from the Linux container on your Windows desktop, you need an X server. Popular choices:
-        *   **VcXsrv:** Download from [SourceForge](https://sourceforge.net/projects/vcxsrv/).
-            *   When launching VcXsrv, use default settings but ensure "Disable access control" is checked on the "Extra settings" page.
+    *   To display the Tcl/Tk GUI from the Linux container on your Windows desktop, you need an X server.
+        *   **VcXsrv:** Download from [SourceForge](https://sourceforge.net/projects/vcxsrv/). When launching, ensure "Disable access control" is checked.
         *   **X410:** Available from the Microsoft Store (paid).
     *   Start your X server before running the Docker container.
 
-3.  **Project Files:**
-    *   Ensure you have the 3DPTV project code (including the `Dockerfile` created in the project root) on your Windows machine. For example, in `C:\Users\YourUser\Documents\repos\3dptv`.
-
-### `Dockerfile` Content
-
-The `Dockerfile` (located in the project root) sets up an Ubuntu 20.04 environment, copies the project code, and **builds the application** with the necessary tools and libraries:
-
-```dockerfile
-# Dockerfile for 3DPTV Application
-# Base image: Ubuntu 20.04 LTS
-FROM ubuntu:20.04
-
-# Set DEBIAN_FRONTEND to noninteractive to avoid prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Update package lists and install dependencies
-# - build-essential: For C/C++ compilers (gcc, g++) and make
-# - cmake: For building the project
-# - git: For version control (optional, but good to have)
-# - tcl-dev, tk-dev: For Tcl/Tk development (headers and libraries)
-# - libtiff-dev: For TIFF image support (headers and libraries)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    git \
-    tcl-dev \
-    tk-dev \
-    libtiff-dev \
-    # Clean up apt cache to reduce image size
-    && rm -rf /var/lib/apt/lists/*
-
-# Set a working directory inside the container
-WORKDIR /3dptv_workspace
-
-# Copy the entire project context into the WORKDIR
-COPY . .
-
-# Build the application
-# This assumes your CMakeLists.txt is in the root and builds in a 'build' subdirectory
-RUN mkdir build && \
-    cd build && \
-    cmake .. && \
-    make
-
-# Default command to run when the container starts
-# This will drop you into a bash shell in the WORKDIR
-# The application is now pre-built
-CMD ["bash"]
-```
+3.  **Project Files (for building the image):**
+    *   You need the 3DPTV project source code (including the `Dockerfile` and `entrypoint.sh` in the project root) to build the image initially. For example, in `C:\\Users\\YourUser\\Documents\\repos\\3dptv`.
 
 ### Steps to Build and Run
 
-1.  **Build the Docker Image:**
-    *   Open a terminal (PowerShell, Command Prompt, or Git Bash) in the root directory of the 3DPTV project on your Windows machine (e.g., `C:\Users\YourUser\Documents\repos\3dptv`).
-    *   Run the following command to build the Docker image. This will include compiling the application and might take some time.
+1.  **Build the Docker Image (One-time setup):**
+    *   Open a terminal (PowerShell or Command Prompt) in the root directory of the 3DPTV project on your Windows machine (e.g., `C:\\Users\\YourUser\\Documents\\repos\\3dptv`).
+    *   Run the following command to build the Docker image. This will compile the application and set up the entrypoint.
         ```bash
         docker build -t 3dptv-app .
         ```
         This tags the image as `3dptv-app`.
 
-2.  **Run the Docker Container:**
+2.  **Run the 3DPTV Application using Docker:**
     *   Ensure your X Server (e.g., VcXsrv) is running on Windows.
-    *   Run the following command in your terminal. **Crucially, replace `C:\Users\YourUser\Documents\repos\3dptv` with the correct absolute path to your project directory on your Windows host.** Pay attention to path syntax if using Git Bash or WSL (e.g., use `/c/Users/...`).
+    *   To run the application, you need to mount your **data directory** (where your images, parameters, and results are or will be stored) into the container. The application will then run using this directory as its working context.
+    *   **Replace `C:\\path\\to\\your\\data\\directory` with the absolute path to your actual data directory on your Windows host.**
 
         ```bash
-        docker run -it --rm \
-            -v "C:\Users\YourUser\Documents\repos\3dptv:/3dptv_workspace" # <-- VERIFY THIS HOST PATH
-            -e DISPLAY=host.docker.internal:0.0 \
-            3dptv-app
+        docker run -it --rm ^
+            -v "C:\\path\\to\\your\\data\\directory:/data" ^
+            -e DISPLAY=host.docker.internal:0.0 ^
+            3dptv-app /data
         ```
         *   `-it`: Runs the container in interactive mode with a terminal.
         *   `--rm`: Automatically removes the container when you exit it.
-        *   `-v "C:\Users\YourUser\Documents\repos\3dptv:/3dptv_workspace"`: Mounts your project directory on Windows to `/3dptv_workspace` inside the container. **Adjust the Windows path accordingly.**
-        *   `-e DISPLAY=host.docker.internal:0.0`: Sets the `DISPLAY` environment variable so GUI applications inside the container can connect to your X server on Windows. If `host.docker.internal` doesn't work, try replacing it with your Windows machine's local IP address (find it using `ipconfig` in a Windows command prompt).
-        *   `3dptv-app`: The name of the Docker image to use.
+        *   `-v "C:\\path\\to\\your\\data\\directory:/data"`: Mounts your Windows host data directory to `/data` inside the container. The application will use `/data` as its working directory. **This is the crucial part for your input/output files.**
+        *   `-e DISPLAY=host.docker.internal:0.0`: Sets the `DISPLAY` environment variable for GUI forwarding. If `host.docker.internal` doesn\'t work, try your machine\'s local IP address (from `ipconfig`).
+        *   `3dptv-app`: The name of the Docker image.
+        *   `/data`: This is passed to the `entrypoint.sh` script inside the container, telling it to use `/data` (which is your mounted host directory) as the working directory for the application.
 
-    *   You should now be inside a bash shell within the Linux container. Your `Dockerfile` sets the `WORKDIR` to `/3dptv_workspace`. **Verify you are in this directory by running `pwd`. Then, list its contents with `ls -la` to ensure your project files are visible.**
+    *   The 3DPTV application GUI should appear on your Windows desktop, operating on the files within your specified data directory.
 
-3.  **Compile the 3DPTV Application (inside the container):**
-    *   This step is **no longer needed** if the `Dockerfile` includes the build process. The application is compiled when the image is built.
-    *   If you make changes to the C/C++ source code on your host machine, you will need to **rebuild the Docker image** using `docker build -t 3dptv-app .` for those changes to take effect.
-
-4.  **Run the 3DPTV Application (inside the container):**
-    *   Navigate to the directory where your main Tcl script (e.g., `ptv.tcl`) is located, or where the compiled executable is (usually within the `build` subdirectory in `/3dptv_workspace`).
-    *   Launch the application. The exact command depends on how your Tcl application is started. It might be something like:
+    *   **Example using the `test` directory from the project:**
+        If your project is at `C:\\Users\\YourUser\\Documents\\repos\\3dptv`, and you want to run with the `test` subdirectory as the data source:
         ```bash
-        # Assuming ptv.tcl is in /3dptv_workspace and your Tcl extension is found
-        cd /3dptv_workspace
-        wish ptv.tcl
+        docker run -it --rm ^
+            -v "C:\\Users\\YourUser\\Documents\\repos\\3dptv\\test:/data" ^
+            -e DISPLAY=host.docker.internal:0.0 ^
+            3dptv-app /data
         ```
-        Or, if your executable is in `build/bin/3dptv` and it handles the Tcl initialization:
+        *(Note: For PowerShell, you might need to quote the volume mount path differently if it contains spaces, e.g., `"-v \'C:\\Path With Spaces\\data:/data\'"`)*
+
+3.  **If no data directory is specified:**
+    *   If you run the container without specifying a directory argument at the end (e.g., `docker run ... 3dptv-app`), the `entrypoint.sh` script will default to using `/opt/3dptv/test` (the `test` directory copied from the project during the image build) as the working directory. This is useful for a quick test or demo.
         ```bash
-        cd /3dptv_workspace/build/bin # Or appropriate build output directory
-        ./3dptv # Or the name of your main executable
+        docker run -it --rm ^
+            -e DISPLAY=host.docker.internal:0.0 ^
+            3dptv-app
         ```
-        The Tcl/Tk GUI should appear on your Windows desktop.
+
+### How it Works
+
+*   The `Dockerfile` now copies the project source to `/opt/3dptv` inside the image and builds the application there.
+*   The `entrypoint.sh` script (also copied into the image) is set as the `ENTRYPOINT`.
+*   When you run `docker run ... 3dptv-app /your/container/path/to/data`, the `/your/container/path/to/data` is passed as an argument to `entrypoint.sh`.
+*   The script changes to this directory and then executes `/opt/3dptv/build/bin/3dptv /opt/3dptv/ptv.tcl`.
+*   Your data (mounted from the host to `/your/container/path/to/data`) is directly accessed by the application.
 
 ### Troubleshooting
 
-*   **Cannot connect to X server:**
-    *   Ensure your X Server (VcXsrv, X410) is running on Windows.
-    *   Verify VcXsrv has "Disable access control" checked.
-    *   Check your Windows Firewall settings; it might be blocking connections to the X server. You might need to allow connections for VcXsrv or your Docker network.
-    *   Try using your explicit Windows IP address for the `DISPLAY` variable: `-e DISPLAY=<your_windows_ip>:0.0`.
-*   **File permission issues:** If you encounter permission errors when the container tries to write files to the mounted volume, ensure Docker Desktop has the necessary permissions to access the shared drive in Docker Desktop settings (Settings -> Resources -> File Sharing).
-*   **`docker build` fails:** Check the output for errors. It's often due to typos in package names or network issues preventing package downloads.
-*   **CMake errors during build:** Ensure all necessary `-dev` packages are listed in the `Dockerfile`.
+*   **Cannot connect to X server / GUI not displaying:**
+    *   Ensure your X Server (VcXsrv) is running and "Disable access control" is checked.
+    *   Check Windows Firewall.
+    *   Try your explicit Windows IP for `DISPLAY`: `-e DISPLAY=<your_windows_ip>:0.0`.
+*   **File permission issues in the mounted data directory:**
+    *   Ensure Docker Desktop has permissions for the shared drive (Settings -> Resources -> File Sharing).
+    *   Unlike Linux, the `--user` flag is not typically used or effective in the same way on Docker Desktop for Windows with WSL2 for volume mounts from the Windows filesystem. Permissions are generally handled by the WSL2 integration. If you encounter issues, ensure the Windows user account running Docker has access to the host directory.
+*   **"Error: Specified working directory \'/data\' does not exist"**:
+    *   This means the volume mount might have failed or the path provided to the entrypoint script is incorrect. Double-check your `-v` mapping in the `docker run` command. The Windows path must be correct, and the container path (e.g., `/data`) must match the argument you give to `3dptv-app` (e.g., `3dptv-app /data`).
+*   **Path issues with `-v` in PowerShell or CMD:**
+    *   CMD: `C:\path\to\your\data` is usually fine.
+    *   PowerShell: If paths have spaces, quote carefully: `'-v "C:\My Path\data:/data"'`. Using WSL-style paths like `/c/Users/...` might also work if you are running `docker` from within a WSL shell.
+*   **If you modify the C/C++ source code or `ptv.tcl`:** You will need to rebuild the Docker image (`docker build -t 3dptv-app .`) for these changes to be included in the container. Changes to your *data files* in the mounted directory are reflected immediately.
 
