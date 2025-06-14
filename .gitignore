@@ -10,8 +10,8 @@ ipch/
 build/
 .clang-format
 .vscode/c_cpp_properties.json
-test/img/*
-test/cal/*
+test/img/*_targets
+test/cal/
 test/res/*
 .vscode/tasks.json
 test/parametersRun1/*
