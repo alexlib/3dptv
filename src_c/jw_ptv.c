@@ -447,7 +447,7 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
       read_image(interp, img_mask_name[i_img], img_mask[i_img]);
       highpass(img_name[i_img], img[i_img], img[i_img], sup, 0, chfield, i_img);
       subtract_mask(img[i_img], img_mask[i_img], img_new[i_img]);
-      copy_images(img_new[i_img], img[i_img]);
+      copy_images(img_new[i_img], img[i_img], imgsize);
 
       if (display) {
         img_handle = Tk_FindPhoto(interp, "temp");
@@ -555,7 +555,7 @@ int detection_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   /* copy images because the target recognition will set greyvalues to 0 */
   for (i_img = 0; i_img < n_img; i_img++)
-    copy_images(img[i_img], img0[i_img]);
+    copy_images(img[i_img], img0[i_img], imgsize);
 
   /* target recognition */
   for (i_img = 0; i_img < n_img; i_img++) {
@@ -1422,7 +1422,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
     /* copy images because the target recognition will set greyvalues to zero */
     for (i = 0; i < n_img; i++)
-      copy_images(img[i], img0[i]);
+      copy_images(img[i], img0[i], imgsize);
 
     /* target recognition */
     for (i = 0; i < n_img; i++) {
