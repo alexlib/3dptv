@@ -125,6 +125,16 @@ P *mega[4];
 
 /***************************************************************************/
 
+/* Helper function to reassign pnr to index for all images */
+void reassign_pnr_all_images(void) {
+  int i_img, i;
+  for (i_img = 0; i_img < n_img; i_img++) {
+    for (i = 0; i < num[i_img]; i++) {
+      pix[i_img][i].pnr = i;
+    }
+  }
+}
+
 int init_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
                 const char **argv) {
   int i;
@@ -250,14 +260,14 @@ int init_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   // commented out, ad holten 04-2013
   // zoomimg = (unsigned char*) calloc(imgsize, 1);
   // if (! zoomimg) {
-  //	 printf ("calloc for zoomimg --> error\n");
-  //	 return TCL_ERROR;
+  //   printf ("calloc for zoomimg --> error\n");
+  //   return TCL_ERROR;
   // }
 
   parameter_panel_init(interp);
   cr_sz = atoi(Tcl_GetVar2(interp, "mp", "pcrossize", TCL_GLOBAL_ONLY));
 
-  display = 1;
+  display = 1;  // display flag, set to 0, ad holten, 04-2013
   return TCL_OK;
 }
 
@@ -612,8 +622,7 @@ int detection_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     quicksort_target_y(pix[i_img], num[i_img]);
 
     /* reorganize target numbers */
-    for (i = 0; i < num[i_img]; i++)
-      pix[i_img][i].pnr = i;
+    reassign_pnr_all_images();
   }
 
   sprintf(buf, "Number of detected particles per image");
@@ -634,12 +643,10 @@ int correspondences_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   int i, i_img;
   double x, y;
 
-  puts("\nTransformation to metric coordinates\n");
+  puts("\n Transformation to metric coordinates \n");
 
   /* rearrange point numbers after manual deletion of points */
-  for (i_img = 0; i_img < n_img; i_img++)
-    for (i = 0; i < num[i_img]; i++)
-      pix[i_img][i].pnr = i;
+  reassign_pnr_all_images();
   /* transformations pixel coordinates -> metric coordinates */
   /* transformations metric coordinates -> corrected metric coordinates */
   for (i_img = 0; i_img < n_img; i_img++) {
@@ -670,25 +677,19 @@ int correspondences_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     mmp.lut = 1;
   }
 
-  clear_drawnobjectslist(); // added, ad holten 04-2013
+  clear_drawnobjectslist();  // added, ad holten 04-2013
   correspondences_4(interp, argv);
 
   /* ------ save pixel coords for tracking  ------- */
   
   char filename[1024];  // Declare filename variable
 
-  for (i_img = 0; i_img < n_img; i_img++) {
-    snprintf(filename, sizeof(filename), "%s_targets", img_name[i_img]);
-    fp1 = fopen(filename, "w");
+  // Save detected targets for each image using write_targets()
+  // The function write_targets(int i_img, const char* filename, target* pix, int num)
+  // should be implemented to encapsulate the file writing logic.
 
-    fprintf(fp1, "%d\n", num[i_img]);
-    for (i = 0; i < num[i_img]; i++) {
-      fprintf(fp1, "%4d %9.4f %9.4f %5d %5d %5d %5d %5d\n", pix[i_img][i].pnr,
-              pix[i_img][i].x, pix[i_img][i].y, pix[i_img][i].n,
-              pix[i_img][i].nx, pix[i_img][i].ny, pix[i_img][i].sumg,
-              pix[i_img][i].tnr);
-    }
-    fclose(fp1);
+  for (i_img = 0; i_img < n_img; i_img++) {
+    write_targets(i_img, img_name[i_img], num[i_img], pix[i_img]);
   }
   return TCL_OK;
 }
@@ -1150,8 +1151,7 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
         /* and for dimitris' tracking */
         quicksort_target_y(pix[k], num[k]);
         /* reorganize target numbers */
-        for (j = 0; j < num[k]; j++)
-          pix[k][j].pnr = j;
+        reassign_pnr_all_images();
       }
       /*
       sprintf (buf, "Number of detected particles per image");

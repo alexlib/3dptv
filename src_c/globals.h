@@ -263,7 +263,7 @@ void  det_lsq_2 (Exterior Ex[2], Interior I[2], Glass G[2], ap_52 ap[2], mm_np m
 // --- ptv.c ---
 void  read_ascii_data(int filenumber);
 void  read_targets(int i_img, int filenumber,  int *num);
-void  write_targets(int n_img, char **img_name, int *num, target **pix);
+void  write_targets(int i_img, char *img_name, int num, target *pix);
 void  write_ascii_data(int filenumber);
 void  write_added(int filenumber);
 void  write_addedback(int filenumber);

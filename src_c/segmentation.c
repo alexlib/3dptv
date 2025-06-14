@@ -38,8 +38,8 @@ int           nr;           image number for display
 
   // void unsharp_mask(int n, unsigned char *img0, unsigned char *img_lp);
 
-  sprintf(lp_name, "%s_lp", pic_name);
-  sprintf(hp_name, "%s_hp", pic_name);
+  snprintf(lp_name, sizeof(lp_name), "%s_lp", pic_name);
+  snprintf(hp_name, sizeof(hp_name), "%s_hp", pic_name);
 
   /* allocate memory */
   img_lp = (unsigned char *)calloc(imgsize, 1);

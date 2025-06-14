@@ -1027,25 +1027,24 @@ void neighbours(float seekx[], float radi[], int nliste[], int *innliste,
  * @param count The number of targets in the collection.
  * @return int Returns 0 on success, or a negative error code on failure.
  */
-void write_targets(int n_img, char **img_name, int *num, target **pix) {
-  int i_img, i;
-  char filename[256];
+void write_targets(int i_img, char *img_name, int num, target *pix) {
+  int i;
+  char filename[1024];
   FILE *fp1;
 
-  for (i_img = 0; i_img < n_img; i_img++) {
-    snprintf(filename, sizeof(filename), "%s_targets", img_name[i_img]);
-    fp1 = fopen(filename, "w");
-    if (!fp1) {
-      printf("Can't open ascii file: %s\n", filename);
-      continue;
-    }
-    fprintf(fp1, "%d\n", num[i_img]);
-    for (i = 0; i < num[i_img]; i++) {
-      fprintf(fp1, "%4d %9.4f %9.4f %5d %5d %5d %5d %5d\n", pix[i_img][i].pnr,
-              pix[i_img][i].x, pix[i_img][i].y, pix[i_img][i].n,
-              pix[i_img][i].nx, pix[i_img][i].ny, pix[i_img][i].sumg,
-              pix[i_img][i].tnr);
-    }
-    fclose(fp1);
+  snprintf(filename, sizeof(filename), "%s_targets", img_name);
+  fp1 = fopen(filename, "w");
+  if (!fp1) {
+    printf("Can't open ascii file: %s\n", filename);
+    return;
   }
+  fprintf(fp1, "%d\n", num);
+  for (i = 0; i < num; i++) {
+    fprintf(fp1, "%4d %9.4f %9.4f %5d %5d %5d %5d %5d\n",
+            pix[i].pnr,
+            pix[i].x, pix[i].y, pix[i].n,
+            pix[i].nx, pix[i].ny, pix[i].sumg,
+            pix[i].tnr);
+  }
+  fclose(fp1);
 }
