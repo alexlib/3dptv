@@ -74,12 +74,12 @@ CMD ["bash"]
         This tags the image as `3dptv-app`.
 
 2.  **Run the Docker Container:**
-    *   Run the following command in your terminal. Replace `/home/youruser/Documents/repos/3dptv` with the actual path to your project directory on your Linux host.
+    *   Run the following command in your terminal. **Crucially, replace `/home/youruser/Documents/repos/3dptv` with the correct absolute path to your project directory on your Linux host.**
 
         ```bash
         docker run -it --rm \
             -v "/tmp/.X11-unix:/tmp/.X11-unix" \
-            -v "/home/youruser/Documents/repos/3dptv:/3dptv_workspace" \
+            -v "/home/youruser/Documents/repos/3dptv:/3dptv_workspace" # <-- VERIFY THIS HOST PATH
             -e DISPLAY=$DISPLAY \
             --user $(id -u):$(id -g) \
             3dptv-app
@@ -92,7 +92,7 @@ CMD ["bash"]
         *   `--user $(id -u):$(id -g)`: (Recommended) Runs the container with your current host user's ID and group ID. This helps avoid permission issues with files created in the mounted volume, ensuring they are owned by you on the host.
         *   `3dptv-app`: The name of the Docker image to use.
 
-    *   You should now be inside a bash shell within the Linux container, in the `/3dptv_workspace` directory. The application has already been compiled during the image build.
+    *   You should now be inside a bash shell within the Linux container. Your `Dockerfile` sets the `WORKDIR` to `/3dptv_workspace`. **Verify you are in this directory by running `pwd`. Then, list its contents with `ls -la` to ensure your project files are visible.**
 
 3.  **Compile the 3DPTV Application (inside the container):**
     *   This step is **no longer needed** if the `Dockerfile` includes the build process. The application is compiled when the image is built.
@@ -118,6 +118,9 @@ CMD ["bash"]
 *   **Cannot connect to X server / GUI not displaying:**
     *   Ensure the `-v "/tmp/.X11-unix:/tmp/.X11-unix"` and `-e DISPLAY=$DISPLAY` options are correctly included in your `docker run` command.
     *   On some systems, you might need to run `xhost +local:docker` on the host before running the container to allow local connections from Docker. (Use with caution, as it can be less secure: `xhost +` allows any local user to connect to your X server. `xhost -local:docker` to revoke).
+*   **Message: "groups: cannot find name for group ID XXXX"**:
+    *   When using the `--user $(id -u):$(id -g)` option, you might see this message upon entering the container. It means that your host's numeric group ID (e.g., 1000) doesn't have a corresponding group *name* defined in the container's `/etc/group` file.
+    *   This is usually a cosmetic warning and does **not** affect the functionality of the application or file permissions (which are based on numeric IDs). You can typically ignore this message if the application runs correctly and file ownership in mounted volumes is correct.
 *   **File permission issues:** Using `--user $(id -u):$(id -g)` in the `docker run` command should prevent most permission issues for files created in the mounted volume. If you still have problems, check the ownership and permissions of the mounted directory on the host.
 *   **`docker build` fails:** Check the output for errors. It's often due to typos in package names or network issues preventing package downloads.
 *   **CMake errors during build:** Ensure all necessary `-dev` packages are listed in the `Dockerfile`.

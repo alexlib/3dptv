@@ -78,11 +78,11 @@ CMD ["bash"]
 
 2.  **Run the Docker Container:**
     *   Ensure your X Server (e.g., VcXsrv) is running on Windows.
-    *   Run the following command in your terminal. Replace `C:\Users\YourUser\Documents\repos\3dptv` with the actual path to your project directory on Windows.
+    *   Run the following command in your terminal. **Crucially, replace `C:\Users\YourUser\Documents\repos\3dptv` with the correct absolute path to your project directory on your Windows host.** Pay attention to path syntax if using Git Bash or WSL (e.g., use `/c/Users/...`).
 
         ```bash
         docker run -it --rm \
-            -v "C:\Users\YourUser\Documents\repos\3dptv:/3dptv_workspace" \
+            -v "C:\Users\YourUser\Documents\repos\3dptv:/3dptv_workspace" # <-- VERIFY THIS HOST PATH
             -e DISPLAY=host.docker.internal:0.0 \
             3dptv-app
         ```
@@ -92,7 +92,7 @@ CMD ["bash"]
         *   `-e DISPLAY=host.docker.internal:0.0`: Sets the `DISPLAY` environment variable so GUI applications inside the container can connect to your X server on Windows. If `host.docker.internal` doesn't work, try replacing it with your Windows machine's local IP address (find it using `ipconfig` in a Windows command prompt).
         *   `3dptv-app`: The name of the Docker image to use.
 
-    *   You should now be inside a bash shell within the Linux container, in the `/3dptv_workspace` directory. The application has already been compiled during the image build.
+    *   You should now be inside a bash shell within the Linux container. Your `Dockerfile` sets the `WORKDIR` to `/3dptv_workspace`. **Verify you are in this directory by running `pwd`. Then, list its contents with `ls -la` to ensure your project files are visible.**
 
 3.  **Compile the 3DPTV Application (inside the container):**
     *   This step is **no longer needed** if the `Dockerfile` includes the build process. The application is compiled when the image is built.

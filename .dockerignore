@@ -1,0 +1,30 @@
+build/
+.git/
+.vscode/
+*.suo
+*.user
+*.ncb
+
+# Docker specific guide files if they are not meant to be in the image
+# Or if they are only for host consumption
+# DOCKER_WINDOWS_GUIDE.md
+# DOCKER_LINUX_GUIDE.md
+
+# CMake cache and user files from local builds
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Specific Visual Studio files if they are in the root
+3dptv_vc2008/
+3dptv_vc2010/
+
+# Test output files if generated locally and not needed in image
+# For example, if test/img/*.res or test/img/*.pts are outputs
+# test/img/*.res
+# test/img/*.pts
+
+# Any other local configuration or temporary files
+*.DS_Store
+*.swp
