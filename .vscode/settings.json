@@ -1,3 +1,6 @@
 {
-    "makefile.makefilePath": "build/"
+    "makefile.makefilePath": "build/",
+    "files.associations": {
+        "random": "c"
+    }
 }

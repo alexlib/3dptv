@@ -180,7 +180,7 @@ void lowpass_3(unsigned char *img, unsigned char *img_lp);
 void unsharp_mask(int n, unsigned char *img0, unsigned char *img_lp);
 void zoom (unsigned char *img, unsigned char *zoomimg, int xm, int ym, int zf);
 void split (unsigned char *img, int field);
-void copy_images(unsigned char *img1, unsigned char *img2);
+void copy_images(unsigned char *img1, unsigned char *img2, size_t size);
 void subtract_mask(unsigned char *img, unsigned char *img_mask, unsigned char *img_new) ;
 
 // --- imgcoord.c ---

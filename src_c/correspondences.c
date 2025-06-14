@@ -76,7 +76,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
       tim[j][i] = 0;
   }
 
-  /* ------- if only one cam and 2D ------- */ // by Beat L�thi June 2007
+  /* ------- if only one cam and 2D ------- */  // by Beat Luthi June 2007
   if (n_img == 1) {
     if (res_name[0] == 0)
       snprintf(res_name, sizeof(res_name), "rt_is");
@@ -87,7 +87,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
                     &Z);
       pix[0][geo[0][i].pnr].tnr = i;
       fprintf(fp1, "%4d", i + 1);
-      fprintf(fp1, " %9.3f %9.3f %9.3f", X, Y, Z);
+      fprintf(fp1, " %9.3f %9.3f %9.3f", X, Y, Z);  /* Write 3D coordinates */
       fprintf(fp1, " %4d", geo[0][i].pnr);
       fprintf(fp1, " %4d", -1);
       fprintf(fp1, " %4d", -1);
@@ -98,7 +98,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   }
   /* -------------end of only one cam and 2D ------------ */
 
-  /* matching  1 -> 2,3,4  +	2 -> 3,4  +  3 -> 4 */
+  /* matching  1 -> 2,3,4  +  2 -> 3,4  +  3 -> 4 */
 
   for (i1 = 0; i1 < n_img - 1; i1++)
     for (i2 = i1 + 1; i2 < n_img; i2++) {
@@ -126,7 +126,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
           /* of correspondences */
           if (count > MAXCAND)
             count = MAXCAND;
-          for (j = 0; j < count; j++) {
+          for (j = 0; j < count && j < MAXCAND; j++) {
             list[i1][i2][p1].p2[j] = cand[j].pnr;
             list[i1][i2][p1].corr[j] = cand[j].corr;
             list[i1][i2][p1].dist[j] = cand[j].tol;

@@ -20,6 +20,7 @@ n histogram:	computes histogram enhance:	enhances gray value spectrum to
 coordinate set, marks the image in a certain (monocomp) color and writes image
 ****************************************************************************/
 #include "ptv.h"
+#include <string.h>
 
 void filter_3(unsigned char *img, unsigned char *img_lp) {
   register unsigned char *ptr, *ptr1, *ptr2, *ptr3, *ptr4, *ptr5, *ptr6, *ptr7,
@@ -216,7 +217,7 @@ void unsharp_mask(int n, unsigned char *img0, unsigned char *img_lp) {
 
   // for (ptrl=imgum, ptrr=img0; ptrl<(imgum+imgsize); ptrl++, ptrr++)
   //  *ptrl = *ptrr;
-  copy_images(img0, imgum); // ad holten, 12-2012
+  copy_images(img0, imgum, imgsize); // ad holten, 12-2012
 
   /* cut off high gray values (not in general use !)
   for (ptrz=imgum; ptrz<(imgum+imgsize); ptrz++) if (*ptrz > 160) *ptrz = 160;
@@ -377,14 +378,14 @@ void split(unsigned char *img, int field) {
     *ptr = 2;
 }
 
-void copy_images(unsigned char *img1, unsigned char *img2) {
+void copy_images(unsigned char *img1, unsigned char *img2, size_t imgsize) {
   // ad holten, 12-2012  replaced with memcpy()
   // register unsigned char *ptr1, *ptr2;
-  // unsigned char		   *end;
+  // unsigned char           *end;
 
   // for (end=img1+imgsize, ptr1=img1, ptr2=img2; ptr1<end; ptr1++, ptr2++)
-  //	*ptr2 = *ptr1;
-  memcpy(img2, img1, imgsize * sizeof(char));
+  // *ptr2 = *ptr1;
+  memcpy(img2, img1, imgsize);
 }
 
 /*------------------------------------------------------------------------

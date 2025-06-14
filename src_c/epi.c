@@ -264,11 +264,11 @@ void find_candidate(coord_2d crd[], target pix[], int num, double xa, double ya,
 void find_candidate_plus(coord_2d crd[], target pix[], int num, double xa,
                          double ya, double xb, double yb, double eps, int n,
                          int nx, int ny, int sumg, candidate cand[], int *count,
-                         int nr, const char **argv)
+                         int nr, const char **argv) {
 
 // binarized search in a x-sorted coord-set, exploits shape information
-// int nr	image number for ap etc.
-{
+// int nr    image number for ap etc. {
+
   register int j;
   int dummy, j0, dj, p2;
   double m, b, d, temp, qn, qnx, qny, qsumg, corr;
@@ -287,12 +287,15 @@ void find_candidate_plus(coord_2d crd[], target pix[], int num, double xa,
     else
       particle_size = ny;
     tol_band_width = eps * 0.5 * (pix_x + pix_y) * particle_size;
-  } else
+  } else {
     tol_band_width = eps;
+  }
 
   if (tol_band_width < 0.06)
     tol_band_width = 0.06;
 
+  // fprintf(stdout, "tol_band_width = %f\n", tol_band_width);
+  /* max. sensor format (HR 480 / Maxscan) */
   /* define sensor format for search interrupt */
   xmin = -pix_x * imx / 2;
   xmax = pix_x * imx / 2;
@@ -348,8 +351,8 @@ void find_candidate_plus(coord_2d crd[], target pix[], int num, double xa,
       //  ad holten, 12-2012 : merged the two if's
       //  if ((crd[j].y > ya-tol_band_width) && (crd[j].y < yb+tol_band_width))
       //  {
-      //	    if ((crd[j].x > xa-tol_band_width) && (crd[j].x <
-      //xb+tol_band_width)) {
+      //     if ((crd[j].x > xa-tol_band_width) && (crd[j].x <
+      // xb+tol_band_width)) {
       if (crd[j].y > ya - tol_band_width && crd[j].y < yb + tol_band_width &&
           crd[j].x > xa - tol_band_width && crd[j].x < xb + tol_band_width) {
         d = fabs((crd[j].y - m * crd[j].x - b) / sqrt(m * m + 1));
@@ -358,34 +361,34 @@ void find_candidate_plus(coord_2d crd[], target pix[], int num, double xa,
         // different sized traced particles, in particular colloids and tracers
         // old : if (d < eps) {
         // new : // if (nx>ny) particle_size=nx;
-        //		 // else	   particle_size=ny;
-        //		 if (d < tol_band_width) {
+        //        // else    particle_size=ny;
+        //        if (d < tol_band_width) {
 
         if (d < tol_band_width) {
           p2 = crd[j].pnr;
           if (n < pix[p2].n)
-            qn = (double)n / pix[p2].n;
+            qn = (double)n / pix[p2].n;  // NOLINT
           else
-            qn = (double)pix[p2].n / n;
+            qn = (double)pix[p2].n / n;  // NOLINT
           if (nx < pix[p2].nx)
-            qnx = (double)nx / pix[p2].nx;
+            qnx = (double)nx / pix[p2].nx;  // NOLINT
           else
-            qnx = (double)pix[p2].nx / nx;
+            qnx = (double)pix[p2].nx / nx;  // NOLINT
           if (ny < pix[p2].ny)
-            qny = (double)ny / pix[p2].ny;
+            qny = (double)ny / pix[p2].ny;  // NOLINT
           else
-            qny = (double)pix[p2].ny / ny;
+            qny = (double)pix[p2].ny / ny;  // NOLINT
           if (sumg < pix[p2].sumg)
-            qsumg = (double)sumg / pix[p2].sumg;
+            qsumg = (double)sumg / pix[p2].sumg;  // NOLINT
           else
-            qsumg = (double)pix[p2].sumg / sumg;
+            qsumg = (double)pix[p2].sumg / sumg;  // NOLINT
 
           // empirical correlation coefficient from shape and
           // brightness parameters
           corr = (4 * qsumg + 2 * qn + qnx + qny);
           // create a tendency to prefer those matches
           // with brighter targets
-          corr *= ((double)(sumg + pix[p2].sumg));
+          corr *= ((double)(sumg + pix[p2].sumg));  // NOLINT
 
           if (qn >= cn && qnx >= cnx && qny >= cny && qsumg > csumg) {
             if (*count < MAXCAND) {
@@ -394,26 +397,24 @@ void find_candidate_plus(coord_2d crd[], target pix[], int num, double xa,
               cand[*count].corr = corr;
               (*count)++;
             } else {
-              dummy = (int)MAXCAND;
+              dummy = (int)MAXCAND;  // NOLINT
               printf("in find_candidate_plus: count > MAXCAND\n");
             }
           }
         }
       }
     }
-  }
-
-  else
+  } else {
     *count = -1; /* out of sensor area */
+  }
 }
 
 void find_candidate_plus_msg(coord_2d crd[], target pix[], int num, double xa,
                              double ya, double xb, double yb, double eps, int n,
                              int nx, int ny, int sumg, candidate cand[],
-                             int *count, int i12)
-//	binarized search in a x-sorted coord-set, exploits shape information  */
-//	gives messages (in examination)  */
-{
+                             int *count, int i12) {
+// binarized search in a x-sorted coord-set, exploits shape information  */
+// gives messages (in examination)  */
   register int j;
   int j0, dj, p2;
   double m, b, d, temp, qn, qnx, qny, qsumg, corr;
@@ -479,32 +480,32 @@ void find_candidate_plus_msg(coord_2d crd[], target pix[], int num, double xa,
         if (d < tol_band_width) {
           p2 = crd[j].pnr;
           if (n < pix[p2].n)
-            qn = (double)n / pix[p2].n;
+            qn = (double)n / pix[p2].n;  // NOLINT
           else
-            qn = (double)pix[p2].n / n;
+            qn = (double)pix[p2].n / n;  // NOLINT
           if (nx < pix[p2].nx)
-            qnx = (double)nx / pix[p2].nx;
+            qnx = (double)nx / pix[p2].nx;  // NOLINT
           else
-            qnx = (double)pix[p2].nx / nx;
+            qnx = (double)pix[p2].nx / nx;  // NOLINT
           if (ny < pix[p2].ny)
-            qny = (double)ny / pix[p2].ny;
+            qny = (double)ny / pix[p2].ny;  // NOLINT
           else
-            qny = (double)pix[p2].ny / ny;
+            qny = (double)pix[p2].ny / ny;  // NOLINT
           if (sumg < pix[p2].sumg)
-            qsumg = (double)sumg / pix[p2].sumg;
+            qsumg = (double)sumg / pix[p2].sumg;  // NOLINT
           else
-            qsumg = (double)pix[p2].sumg / sumg;
+            qsumg = (double)pix[p2].sumg / sumg;  // NOLINT
 
           // empirical correlation coefficient from shape and
           // brightness parameters
           corr = (4 * qsumg + 2 * qn + qnx + qny);
           // create a tendency to prefer those matches
           // with brighter targets
-          corr *= ((double)(sumg + pix[p2].sumg));
+          corr *= ((double)(sumg + pix[p2].sumg));  // NOLINT
 
           if (qn >= cn && qnx >= cnx && qny >= cny && qsumg > csumg) {
             if (*count >= MAXCAND) {
-              printf("More candidates than (MAXCAND): %d\n", *count);
+              printf("More candidates than (%d): %d\n", MAXCAND, *count);
               return;
             }
             cand[*count].pnr = p2;
@@ -518,11 +519,12 @@ void find_candidate_plus_msg(coord_2d crd[], target pix[], int num, double xa,
     }
     if (*count == 0)
       puts("- - -");
-  } else
+  } else {
     *count = -1; /* out of sensor area */
+  }
 }
 
-#ifdef EVER_CALLED // Unused function, ad holten 12-2012
+#ifdef EVER_CALLED  // Unused function, ad holten 12-2012
 void crossprod(double a[3], double b[3], double c[3]) {
   c[0] = a[1] * b[2] - a[2] * b[1];
   c[1] = a[2] * b[0] - a[0] * b[2];
