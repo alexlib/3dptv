@@ -79,7 +79,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   /* ------- if only one cam and 2D ------- */ // by Beat L�thi June 2007
   if (n_img == 1) {
     if (res_name[0] == 0)
-      sprintf(res_name, "rt_is");
+      snprintf(res_name, sizeof(res_name), "rt_is");
     fp1 = fopen(res_name, "w");
     fprintf(fp1, "%4d\n", num[0]);
     for (i = 0; i < num[0]; i++) {
@@ -102,7 +102,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
 
   for (i1 = 0; i1 < n_img - 1; i1++)
     for (i2 = i1 + 1; i2 < n_img; i2++) {
-      sprintf(buf, "Establishing correspondences  %d - %d", i1, i2);
+      snprintf(buf, sizeof(buf), "Establishing correspondences  %d - %d", i1, i2);
       puts(buf);
 
       /* establish correspondences from num[i1] points of img[i1] to img[i2] */
@@ -225,7 +225,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
     }
 
     match4 = match;
-    sprintf(buf, "%d consistent quadruplets, ", match4);
+    snprintf(buf, sizeof(buf), "%d consistent quadruplets, ", match4);
     puts(buf);
   }
 
@@ -386,14 +386,14 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
 
       con[match++] = con0[i];
     }
-  } // end pairs
+  }  // end pairs
 
   match2 = match - match4 - match3;
   if (n_img == 1) {
-    sprintf(buf, "determined %d points from 2D", match1);
+    snprintf(buf, sizeof(buf), "determined %d points from 2D", match1);
     puts(buf);
   } else {
-    sprintf(buf,
+    snprintf(buf, sizeof(buf),
             "%d consistent quadruplets(red), %d triplets(green) and %d "
             "unambigous pairs",
             match4, match3, match2);

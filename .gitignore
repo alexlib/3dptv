@@ -13,3 +13,4 @@ build/
 test/img/*
 test/cal/*
 test/res/*
+.vscode/tasks.json
