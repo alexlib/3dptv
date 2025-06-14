@@ -364,7 +364,7 @@ int start_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   }
 
   /* read and display original images */
-  clear_drawnobjectslist();  // added, ad holten, 04-2013
+  clear_drawnobjectslist(n_img);  // added, ad holten, 04-2013
   for (i = 0; i < n_img; i++) {
     /* reading */
     snprintf(val, sizeof(val), "camcanvas %d", i + 1);
@@ -418,24 +418,20 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
   /* Matthias JULI 08 read checkmark for masks and create mask names*/
 
   fpp = fopen_rp(
-      "parameters/targ_rec.par"); // replaced fopen_r, ad holten 12-2012
+      "parameters/targ_rec.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
 
   for (i = 0; i < 14; i++)
     fscanf(fpp, "%d", &mask); /*checkmark for subtract mask */
-  fscanf(fpp, "%s\n", img_mask_path);
+  fscanf(fpp, "%511s\n", img_mask_path);
   fclose(fpp);
 
   /*read mask names*/
-  strcpy(img_mask_name[0], img_mask_path);
-  strcat(img_mask_name[0], ".0");
-  strcpy(img_mask_name[1], img_mask_path);
-  strcat(img_mask_name[1], ".1");
-  strcpy(img_mask_name[2], img_mask_path);
-  strcat(img_mask_name[2], ".2");
-  strcpy(img_mask_name[3], img_mask_path);
-  strcat(img_mask_name[3], ".3");
+  snprintf(img_mask_name[0], sizeof(img_mask_name[0]), "%s.0", img_mask_path);
+  snprintf(img_mask_name[1], sizeof(img_mask_name[1]), "%s.1", img_mask_path);
+  snprintf(img_mask_name[2], sizeof(img_mask_name[2]), "%s.2", img_mask_path);
+  snprintf(img_mask_name[3], sizeof(img_mask_name[3]), "%s.3", img_mask_path);
 
   /* if the checkmark is set, read mask-image and subtract it from the
    * filtered-original image.*/
@@ -444,7 +440,7 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
   // - subtract mask from original image
   // - copy subtracted imgage on the original image
   if (display)
-    clear_drawnobjectslist();  // added, ad holten 04-2013
+    clear_drawnobjectslist(n_img);  // added, ad holten 04-2013
 
   if (mask == 1) {  // read mask image
     for (i_img = 0; i_img < n_img; i_img++) {
@@ -471,7 +467,7 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
         get_tclzoomparms(interp, &zoompar, i_img);
         snprintf(val, sizeof(val), "newimage %d %f %f %d %d", i_img + 1, zoompar.xc,
                 zoompar.yc, zoompar.fac, zoompar.fixed);
-        Tcl_GlobalEval(interp, val);
+        Tcl_Eval(interp, val);
       }
     }
   }
@@ -488,9 +484,9 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
         // changed, see mask == 1,  ad holten, 04-2013
         get_tclzoomparms(interp, &zoompar, i_img);
-        sprintf(val, "newimage %d %f %f %d %d", i_img + 1, zoompar.xc,
+        snprintf(val, sizeof(val), "newimage %d %f %f %d %d", i_img + 1, zoompar.xc,
                 zoompar.yc, zoompar.fac, zoompar.fixed);
-        Tcl_GlobalEval(interp, val);
+        Tcl_Eval(interp, val);
       }
     }
   }
@@ -523,14 +519,14 @@ int detection_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   Tcl_Eval(interp, ".text insert 2 $tbuf");
 
   if (display) {
-    clear_drawnobjectslist(); // added, ad holten, 04-2013
+    clear_drawnobjectslist(n_img); // added, ad holten, 04-2013
     for (i_img = 0; i_img < n_img; i_img++) {
       img_handle = Tk_FindPhoto(interp, "temp");
       Tk_PhotoGetImage(img_handle, &img_block);
       tclimg2cimg(interp, img[i_img], &img_block);
-      // sprintf(val, "newimage %d", i_img+1);		// ad holten, 04-2013
+      // sprintf(val, "newimage %d", i_img+1);        // ad holten, 04-2013
       get_tclzoomparms(interp, &zoompar, i_img);
-      sprintf(val, "newimage %d %f %f %d %d", i_img + 1, zoompar.xc, zoompar.yc,
+      snprintf(val, sizeof(val), "newimage %d %f %f %d %d", i_img + 1, zoompar.xc, zoompar.yc,
               zoompar.fac, zoompar.fixed);
       Tcl_Eval(interp, val);
     }
@@ -609,13 +605,13 @@ int detection_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
       if (display) {
         for (j = 0; j < num[i_img]; j++)
-          drawcross(interp, (int)pix[i_img][j].x, (int)pix[i_img][j].y, cr_sz,
+          drawcross(interp, (int)pix[i_img][j].x, (int)pix[i_img][j].y, cr_sz,  // NOLINT
                     i_img, "blue");
       }
       break;
     }
-    sprintf(buf, "%d: %d,  ", i_img + 1, num[i_img]);
-    strcat(val, buf);
+    snprintf(buf, sizeof(buf), "%d: %d,  ", i_img + 1, num[i_img]);
+    snprintf(val + strlen(val), sizeof(val) - strlen(val), "%s", buf);
 
     /* proper sort of targets in y-direction for later binary search */
     /* and for dimitris' tracking */
@@ -625,7 +621,7 @@ int detection_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     reassign_pnr_all_images();
   }
 
-  sprintf(buf, "Number of detected particles per image");
+  snprintf(buf, sizeof(buf), "Number of detected particles per image");
   Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
   Tcl_Eval(interp, ".text delete 2");
   Tcl_Eval(interp, ".text insert 2 $tbuf");
@@ -677,7 +673,7 @@ int correspondences_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     mmp.lut = 1;
   }
 
-  clear_drawnobjectslist();  // added, ad holten 04-2013
+  clear_drawnobjectslist(n_img);  // added, ad holten 04-2013
   correspondences_4(interp, argv);
 
   /* ------ save pixel coords for tracking  ------- */
@@ -1112,7 +1108,10 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
         // sprintf(buf, "newimage %d",  k+1);      replaced, ad holten,
         // 04-2013
-        clear_drawnobjectslist();
+        if (clear_drawnobjectslist(n_img) != TCL_OK) {
+          Tcl_SetResult(interp, "Error clearing markers", TCL_STATIC);
+          return TCL_ERROR;
+        }
         get_tclzoomparms(interp, &zoompar, k);
     snprintf(buf, sizeof(buf), "newimage %d %f %f %d %d", k + 1, zoompar.xc, zoompar.yc,
         zoompar.fac, zoompar.fixed);
@@ -1343,7 +1342,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   // clearing all objects in the objects list
   if (sel == 1 || sel == 2 || sel == 6)
-    clear_drawnobjectslist();
+    clear_drawnobjectslist(n_img);
 
   switch (sel) {
   case 1: /*	read calibration parameter file  */
@@ -1750,9 +1749,9 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   case 6:
     puts("Orientation");
-    snprintf(buf, sizeof(buf), " ");
+    buf[0] = '\0';
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < n_img; i++) {
       snprintf(safety[i], sizeof(safety[i]), "safety_%d.ori", i);
       snprintf(safety_addpar[i], sizeof(safety_addpar[i]), "safety_%d.addpar", i);
     }

@@ -23,7 +23,7 @@ Copyright (c) 1990-2011 ETH Zurich
 See the file license.txt for copying permission.
 */
 
-#include "ptv.h"
+#include "ptv.h"  // NOLINT
 
 void just_plot(Tcl_Interp *interp, Exterior Ex, Interior I, Glass G, ap_52 ap,
                mm_np mm, int imx, int imy, double pix_x, double pix_y, int nfix,
@@ -39,9 +39,9 @@ void just_plot(Tcl_Interp *interp, Exterior Ex, Interior I, Glass G, ap_52 ap,
     metric_to_pixel(xp, yp, imx, imy, pix_x, pix_y, &xp, &yp, field);
 
     /* draw projected points for check purpuses */
-    intx = (int)xp;
-    inty = (int)yp;
-    printf("coord of point %d: %d, %d\n", i, intx, inty);
+    intx = (int)xp;  // NOLINT
+    inty = (int)yp;  // NOLINT
+    // printf("coord of point %d: %d, %d\n", i, intx, inty);
 
     drawcross(interp, intx, inty, cr_sz + 1, n_img, "yellow");
     draw_pnr(interp, intx, inty, fix[i].pnr, n_img, "yellow");
@@ -54,7 +54,7 @@ void sortgrid_man(Tcl_Interp *interp, Exterior Ex, Interior I, Glass G,
                   int field, int n_img) {
   int i, j, intx, inty;
   double xp, yp, eps = 10.0;
-  //	target	old[512];
+  //  target  old[512];
   target old[1024];
 
   /* copy and re-initialize pixel data before sorting */
@@ -92,7 +92,7 @@ void sortgrid_man(Tcl_Interp *interp, Exterior Ex, Interior I, Glass G,
     intx = (int)xp;
     inty = (int)yp;
 
-    printf("coord of point %d: %d, %d\n", i, intx, inty);
+    // printf("coord of point %d: %d, %d\n", i, intx, inty);
     drawcross(interp, intx, inty, cr_sz + 1, n_img, "cyan");
 
     if (xp > -eps && yp > -eps && xp < imx + eps && yp < imy + eps) {

@@ -341,7 +341,7 @@ int mouse_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     //		Tcl_Eval(interp, ".text delete 2");
     //		Tcl_Eval(interp, ".text insert 2 $tbuf");
     //	}
-    //	clear_drawnobjectslist();	// no saving of drawn objects now
+    //	clear_drawnobjectslist(n_img);	// no saving of drawn objects now
     //	break;
 
     // not used anymore, ad holtem 04-2014

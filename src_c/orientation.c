@@ -1121,7 +1121,7 @@ void orient_v3(Tcl_Interp *interp, Exterior Ex0, Interior I0, Glass G0,
   get_tclzoomparms(interp, &zoompar, nr);
   sprintf(val, "newimage %d %f %f %d %d", nr, zoompar.xc, zoompar.yc,
           zoompar.fac, zoompar.fixed);
-
+  puts(val);  // debugging output
   Tcl_Eval(interp, val);
   //}
 

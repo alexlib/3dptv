@@ -30,24 +30,27 @@ void expand_markersbuffer(int imgnr) {
   Marker *oldmarkers = markers[imgnr];
 
   maxnmarkers[imgnr] = nmarkers[imgnr] + 1000;
-  markers[imgnr] = (Marker *)malloc(maxnmarkers[imgnr] * sizeof(Marker));
-  if (markers[imgnr] > 0) {
-    for (i = 0; i < nmarkers[imgnr]; i++)
-      markers[imgnr][i] = oldmarkers[i];
-    free(oldmarkers);
+  markers[imgnr] = (Marker *)malloc(maxnmarkers[imgnr] * sizeof(Marker));  // NOLINT
+  if (markers[imgnr] == NULL) {
+    fprintf(stderr, "Error: Unable to allocate memory for markers[%d]\n", imgnr);
+    exit(EXIT_FAILURE);
   }
+  for (i = 0; i < nmarkers[imgnr]; i++)
+    markers[imgnr][i] = oldmarkers[i];
+  free(oldmarkers);
 }
 
-void clear_drawnobjectslist() {
-  int i_img;
-  for (i_img = 0; i_img < n_img; i_img++) {
-    // if (nmarkers[i_img] > 0 && markers[i_img] != NULL)
-    if (markers[i_img] != NULL)
-      free(markers[i_img]);
-    nmarkers[i_img] = 0;
-    markers[i_img] = NULL;
-    maxnmarkers[i_img] = 0;
-  }
+int clear_drawnobjectslist(int n_img) {
+    int i_img;
+    for (i_img = 0; i_img < n_img; i_img++) {
+        // if (nmarkers[i_img] > 0 && markers[i_img] != NULL)
+        if (markers[i_img] != NULL)
+            free(markers[i_img]);
+        nmarkers[i_img] = 0;
+        markers[i_img] = NULL;
+        maxnmarkers[i_img] = 0;
+    }
+    return TCL_OK;
 }
 
 void add_mark(int x0, int y0, int imgnr) {
@@ -75,7 +78,7 @@ void add_cross(int x0, int y0, int size, int imgnr, char *color) {
   pm->y = y0;
   pm->size = size;
   pm->type = OBJ_CROSS;
-  strcpy(pm->color, color);
+  snprintf(pm->color, sizeof(pm->color), "%s", color);
   nmarkers[imgnr]++;
 }
 
@@ -143,7 +146,10 @@ void add_vector(int imgnr, int x0, int y0, int x1, int y1, int width,
 
 int clearmarkers_c(ClientData clientData, Tcl_Interp *interp, int argc,
                    const char **argv) {
-  clear_drawnobjectslist();
+  if (clear_drawnobjectslist(n_img) != TCL_OK) {
+    Tcl_SetResult(interp, "Error clearing markers", TCL_STATIC);
+    return TCL_ERROR;
+  }
   return TCL_OK;
 }
 
@@ -223,13 +229,15 @@ int drawoval(Tcl_Interp *interp, int x0, int y0, int size, int imgnr,
 int drawvector(Tcl_Interp *interp, int x0, int y0, int x1, int y1, int width,
                int imgnr, char color[]) {
   char val[256];
-  if (!skip_adding) // add vector to the objects to be redrawn
+  // printf("skip_adding = %d\n", skip_adding);
+  if (!skip_adding)  // add vector to the objects to be redrawn
     add_vector(imgnr, x0, y0, x1, y1, width, color);
 
-  img_to_view_coordinates(&x0, &y0, (double)x0, (double)y0, imgnr);
-  img_to_view_coordinates(&x1, &y1, (double)x1, (double)y1, imgnr);
-  sprintf(val, "drawline %d %d %d %d %d %d %s", x0, y0, x1, y1, width,
-          imgnr + 1, color);
+  img_to_view_coordinates(&x0, &y0, (double)x0, (double)y0, imgnr);  // NOLINT
+  img_to_view_coordinates(&x1, &y1, (double)x1, (double)y1, imgnr);  // NOLINT
+  snprintf(val, sizeof(val), "drawline %d %d %d %d %d %d %s", x0, y0, x1, y1, width,
+          imgnr, color);  // debugging i change here val for Tcl_Eval
+  // puts(val);  // Debugging output
   Tcl_Eval(interp, val);
   return TCL_OK;
 }
@@ -435,7 +443,7 @@ int mark_track_c(ClientData clientData, Tcl_Interp *interp, int argc,
   if (!fpp)
     return TCL_OK;
   for (i_img = 0; i_img < 4; i_img++)
-    fscanf(fpp, "%s\n", seq_name[i_img]);
+    fscanf(fpp, "%127s\n", seq_name[i_img]);
 
   /* name of sequence */
   fscanf(fpp, "%d\n", &seq_first);
@@ -451,7 +459,8 @@ int mark_track_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   for (i_img = 0; i_img < n_img; i_img++)  // added, ad holten, 04-2013
     get_tclzoomparms(interp, &zoompar[i_img], i_img);
-  clear_drawnobjectslist();
+
+  clear_drawnobjectslist(n_img);
 
   /* track sequence */
   for (i_seq = seq_first; i_seq <= seq_last; i_seq++) {

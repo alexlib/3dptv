@@ -153,7 +153,7 @@ void mark_corr (Tcl_Interp* interp, int nr);
 int  mark_track_c(ClientData clientData, Tcl_Interp* interp, int argc, const char** argv);
 int  trajectories_c(ClientData clientData, Tcl_Interp* interp, int argc, const char** argv);
 void add_mark(int x0, int y0, int imgnr);
-void clear_drawnobjectslist();
+int clear_drawnobjectslist(int n_img);
 int  clearmarkers_c(ClientData clientData, Tcl_Interp* interp, int argc, const char** argv);
 void clicked_to_imgcoordinates(int *px, int *py, double x, double y, int n);
 void draw_objects(Tcl_Interp* interp, int imgnr);

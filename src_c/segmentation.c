@@ -21,15 +21,14 @@ Routines contained:     unsharp_mask ()
 #include "ptv.h" // NOLINT
 
 void highpass(char *pic_name, unsigned char *img, unsigned char *img_hp,
-              int dim_lp, int filter_hp, int field, int nr) { /*
-char          *pic_name     image name
-unsigned char *img
-unsigned char *img_hp       highpass filtered image
-int           dim_lp        dimension of subtracted lowpass image
-int           filter_hp     flag for additional filtering of _hp
-int           field;        field to be used
-int           nr;           image number for display
-*/
+              int dim_lp, int filter_hp, int field, int nr) {
+// char          *pic_name     image name
+// unsigned char *img
+// unsigned char *img_hp       highpass filtered image
+// int           dim_lp        dimension of subtracted lowpass image
+// int           filter_hp     flag for additional filtering of _hp
+// int           field;        field to be used
+// int           nr;           image number for display
   register int i;
   FILE *fp;
   unsigned char *img_lp;
@@ -101,7 +100,7 @@ int           nr;           image number for display
 
 void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
               char par_file[], int xmin, int xmax, int ymin, int ymax,
-              target pix[], int nr, int *num)
+              target pix[], int nr, int *num) {
 /*
     unsigned char *img, *img0           image data, image to be set to zero
     char          par_file[]            name of parameter file
@@ -113,7 +112,6 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
     thresholding and center of gravity with a peak fitting technique
     uses 4 neighbours for connectivity and 8 to find local maxima
 */
-{
   register int i, j, m;
   int n = 0, n_wait = 0, n_targets = 0, sumg, sumg_min;
   int numpix, thres, gvthres[4], disco, cr_sz;
@@ -125,7 +123,7 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
   register unsigned char gv, gvref;
 
   /* read image name, filter dimension and threshold from parameter file */
-  fpp = fopen_rp(par_file); // replaced fopen_r(), ad holten 12-2012
+  fpp = fopen_rp(par_file);  // replaced fopen_r(), ad holten 12-2012
   if (!fpp)
     return;
   fscanf(fpp, "%d", &gvthres[0]);      /* threshold for binarization 1.image */
@@ -145,7 +143,7 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
 
   /*  thresholding and connectivity analysis in image  */
 
-  // for (i=ymin; i<ymax; i++)  for (j=xmin; j<xmax; j++)		replaced, ad
+  // for (i=ymin; i<ymax; i++)  for (j=xmin; j<xmax; j++) replaced, ad
   // holten 12-2012
   for (i = ymin + 1; i < ymax - 1; i++)
     for (j = xmin + 1; j < xmax - 1; j++) {
@@ -156,9 +154,8 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
           gv >= *(img + (i - 1) * imx + j - 1) &&
           gv >= *(img + (i + 1) * imx + j - 1) &&
           gv >= *(img + (i - 1) * imx + j + 1) &&
-          gv >= *(img + (i + 1) * imx + j + 1))
-      /* => local maximum, 'peak' */
-      {
+          gv >= *(img + (i + 1) * imx + j + 1)) {
+          /* => local maximum, 'peak' */
         yn = i;
         xn = j;
         sumg = gv;
@@ -197,7 +194,7 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
             if (gv > thres
                 // && xn>=xmin && xn<xmax && yn>=ymin && yn<ymax
                 && xn > xmin && xn < xmax - 1 && yn > ymin &&
-                yn < ymax - 1 // bug repaired, ad holten 02-2013
+                yn < ymax - 1  // bug repaired, ad holten 02-2013
                 && gv <= gvref + disco &&
                 gvref + disco >= *(img0 + imx * (yn - 1) + xn) &&
                 gvref + disco >= *(img0 + imx * (yn + 1) + xn) &&
@@ -253,8 +250,8 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
           pix[n_targets].pnr = n_targets;
           n_targets++;
 
-          xn = (int)x;
-          yn = (int)y;
+          xn = (int)x;  // NOLINT
+          yn = (int)y;  // NOLINT
           drawcross(interp, xn, yn, cr_sz, nr, "Blue");
         }
       }
@@ -265,7 +262,7 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
 void simple_connectivity(Tcl_Interp *interp, unsigned char *img0,
                          unsigned char *img, char par_file[], int xmin,
                          int xmax, int ymin, int ymax, target pix[], int nr,
-                         int *num)
+                         int *num) {
 /*
         unsigned char *img, *img0			image data, image to be
    set to zero char          par_file[]			name of parameter file
@@ -278,7 +275,6 @@ void simple_connectivity(Tcl_Interp *interp, unsigned char *img0,
 */
 /*    thresholding and center of gravity with a peak fitting technique  */
 /*    uses 4 neighbours for connectivity and 8 to find local maxima      */
-{
   register unsigned char gv, gvref;
   register int i, j, m;
   int n = 0, n_wait = 0, n_targets = 0, sumg, sumg_min, numpix, thres, cr_sz;
@@ -290,7 +286,7 @@ void simple_connectivity(Tcl_Interp *interp, unsigned char *img0,
   targpix waitlist[2048];
 
   /* read image name, threshold and shape limits from parameter file */
-  fpp = fopen_rp(par_file); // replaced fopen_r(), ad holten 12-2012
+  fpp = fopen_rp(par_file);  // replaced fopen_r(), ad holten 12-2012
   if (!fpp)
     return;
   fscanf(fpp, "%d", &thres); /* threshold for binarization */
@@ -299,18 +295,18 @@ void simple_connectivity(Tcl_Interp *interp, unsigned char *img0,
   fscanf(fpp, "%*d");        //
   fscanf(fpp, "%d", &n);     /* threshold value for discontinuity */
   fscanf(fpp, "%d%d", &nnmin,
-         &nnmax); /* min. and max. number of			 */
+         &nnmax);  /* min. and max. number of */
   fscanf(fpp, "%d%d", &nxmin,
-         &nxmax); /* pixels per target,				 */
+         &nxmax);  /* pixels per target, */
   fscanf(fpp, "%d%d", &nymin,
-         &nymax); /* abs, in x, in y				   	 */
+         &nymax);  /* abs, in x, in y */
   fscanf(fpp, "%d",
          &sumg_min);         /* min. sumg         */
   fscanf(fpp, "%d", &cr_sz); /* size of crosses */
   fclose(fpp);
 
   /*  thresholding and connectivity analysis in image  */
-  // for (i=ymin; i<ymax; i++)  for (j=xmin; j<xmax; j++)		replaced, ad
+  // for (i=ymin; i<ymax; i++)  for (j=xmin; j<xmax; j++) replaced, ad
   // holten 12-2012
   for (i = ymin + 1; i < ymax - 1; i++)
     for (j = xmin + 1; j < xmax - 1; j++) {
@@ -398,8 +394,8 @@ void simple_connectivity(Tcl_Interp *interp, unsigned char *img0,
           pix[n_targets].pnr = n_targets;
           n_targets++;
 
-          xn = (int)x;
-          yn = (int)y;
+          xn = (int)x;  // NOLINT
+          yn = (int)y;  // NOLINT
           // drawcross (xn, yn, cr_sz, 8);  // bug, ad holten, 12-2012
           drawcross(interp, xn, yn, cr_sz, nr, "Blue");
         }

@@ -274,7 +274,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
           }
 
     /* -----------------------------------------------------------------------
-     */
+    */
 
     /* sort triplets for match quality (.corr) */
     quicksort_con(con0, match0);
@@ -416,7 +416,8 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
 
   /* draw crosses on canvas */
   if (display) {
-    clear_drawnobjectslist();
+    clear_drawnobjectslist(n_img);
+
     for (i = 0; i < n_img; i++)
       get_tclzoomparms(interp, &zoompar[i], i);
 
