@@ -14,3 +14,5 @@ test/img/*
 test/cal/*
 test/res/*
 .vscode/tasks.json
+test/parametersRun1/*
+test2/*
