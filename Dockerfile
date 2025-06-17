@@ -38,9 +38,12 @@ RUN mkdir build && \
     cmake .. && \
     make
 
-# Copy the entrypoint script and make it executable
+# Copy the entrypoint script and ensure correct line endings and permissions
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN apt-get update && apt-get install -y dos2unix && \
+    dos2unix /usr/local/bin/entrypoint.sh && \
+    chmod +x /usr/local/bin/entrypoint.sh && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set the entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
