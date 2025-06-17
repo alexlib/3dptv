@@ -41,7 +41,7 @@ int peak_fit_new(Tcl_Interp *interp, unsigned char *img, char par_file[],
   int x8[8], y8[8]; /* neighbours for connectivity */
   int p2;           /* considered point number */
   int sumg_min, gvthres[4], thres, disco, nxmin, nxmax, nymin, nymax, nnmin,
-      nNMAX, rel_disc, dummy;
+      nnmax, rel_disc, dummy;
   /* parameters for target acceptance */
   int pnr, sumg, xn, yn; /* collecting variables for center of gravity */
   int n_target = 0;      /* # of targets detected */
@@ -72,7 +72,7 @@ int peak_fit_new(Tcl_Interp *interp, unsigned char *img, char par_file[],
   fscanf(fpp, "%d", &gvthres[2]); /* threshold for binarization 3.image */
   fscanf(fpp, "%d", &gvthres[3]); /* threshold for binarization 4.image */
   fscanf(fpp, "%d", &disco);      /* max discontinuity */
-  fscanf(fpp, "%d  %d", &nnmin, &nNMAX); /* min. and max. number of */
+  fscanf(fpp, "%d  %d", &nnmin, &nnmax); /* min. and max. number of */
   fscanf(fpp, "%d  %d", &nxmin, &nxmax); /* pixels per target,	   */
   fscanf(fpp, "%d  %d", &nymin, &nymax); /* abs, in x, in y		  */
   fscanf(fpp, "%d", &sumg_min);          /* min. sumg */
@@ -391,7 +391,7 @@ int peak_fit_new(Tcl_Interp *interp, unsigned char *img, char par_file[],
         (peaks[i].ymax - peaks[i].ymin + 1) >= nymin &&
         (peaks[i].xmax - peaks[i].xmin) < nxmax &&
         (peaks[i].ymax - peaks[i].ymin) < nymax && peaks[i].n >= nnmin &&
-        peaks[i].n <= nNMAX) {
+        peaks[i].n <= nnmax) {
       sumg = peaks[i].sumg;
 
       /* target coordinates */
