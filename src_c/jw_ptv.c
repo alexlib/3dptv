@@ -957,18 +957,18 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   Tk_PhotoImageBlock img_block;
   double slice_step;
   double slicethickness;
-  double zdim; // z_cen_slice[19], removed ad holten, 12-2012
+  double zdim;  // z_cen_slice[19], removed ad holten, 12-2012
   int dumbbell = 0, step_shake = 1;
   double dummy;
   Zoompar zoompar;
 
   fpp = fopen_rp(
-      "parameters/sequence.par"); // replaced fopen_r, ad holten, 12-2012
+      "parameters/sequence.par");  // replaced fopen_r, ad holten, 12-2012
   if (!fpp)
     return TCL_OK;
 
-  for (i = 0; i < 4; i++)
-    fscanf(fpp, "%s\n", seq_name[i]); /* name of sequence */
+  for (i = 0; i < n_img; i++)
+    fscanf(fpp, "%127s\n", seq_name[i]); /* name of sequence */
   fscanf(fpp, "%d\n", &seq_first);
   fscanf(fpp, "%d\n", &seq_last);
   fclose(fpp);
@@ -981,11 +981,11 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   }
 
   /* scanning ptv ************** */
-  printf("\nObject volume is scanned in %d slices!\n", nslices);
+  printf("\n Object volume is scanned in %d slices!\n", nslices);
   slicepos = 0;
   /* read illuminated Volume */
   fpp = fopen_rp(
-      "parameters/criteria.par"); // replaced fopen_r, ad holten, 12-2012
+      "parameters/criteria.par");  // replaced fopen_r, ad holten, 12-2012
   if (!fpp)
     return TCL_OK;
 
@@ -1051,10 +1051,10 @@ int sequence_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     // printf("\n step: %d, zslice[j]: %f, slicepos: %d \n", i, zslice[j],
     // slicepos);
 
-    //		Zmax_lay[0]= z_cen_slice[slicepos] - slicethickness/2.0;
-    //		Zmin_lay[0]= z_cen_slice[slicepos] + slicethickness/2.0;
-    //		Zmax_lay[1]= z_cen_slice[slicepos] - slicethickness/2.0;
-    //		Zmin_lay[1]= z_cen_slice[slicepos] + slicethickness/2.0;
+    // Zmax_lay[0]= z_cen_slice[slicepos] - slicethickness/2.0;
+    // Zmin_lay[0]= z_cen_slice[slicepos] + slicethickness/2.0;
+    // Zmax_lay[1]= z_cen_slice[slicepos] - slicethickness/2.0;
+    // Zmin_lay[1]= z_cen_slice[slicepos] + slicethickness/2.0;
     // printf("in sequence zslice[j]: %f, zmin0: %f, zmax0: %f\n",
     // z_cen_slice[slicepos], Zmax_lay[0],Zmin_lay[0] );
 
