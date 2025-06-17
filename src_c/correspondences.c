@@ -241,13 +241,13 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
         for (i3 = i2 + 1; i3 < n_img; i3++)
           for (i = 0; i < num[i1]; i++) {
             p1 = list[i1][i2][i].p1;
-            if (p1 > nmax || tim[i1][p1] > 0)
+            if (p1 >= nmax || tim[i1][p1] > 0)
               continue;
 
             for (j = 0; j < list[i1][i2][i].n; j++)
               for (k = 0; k < list[i1][i3][i].n; k++) {
                 p2 = list[i1][i2][i].p2[j];
-                if (p2 > nmax || tim[i2][p2] > 0)
+                if (p2 >= nmax || tim[i2][p2] > 0)
                   continue;
                 p3 = list[i1][i3][i].p2[k];
                 if (p3 > nmax || tim[i3][p3] > 0)
@@ -324,9 +324,6 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
 
   // search consistent pairs :  12, 13, 14, 23, 24, 34
 
-  // only if an object model is available or if only 2 images are used
-  // if (1<2 && n_img>1 && allCam_flag==0) {		//	removed 1<2, ad holten,
-  // 12-2012
   if (n_img > 1 && allCam_flag == 0) {
     puts("Search pairs");
 
@@ -334,30 +331,33 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
     for (i1 = 0; i1 < n_img - 1; i1++) {
       // if ( n_img == 2 || (num[0] < 64 && num[1] < 64 && num[2] < 64 && num[3]
       // < 64))
-      if (n_img > 1) {
-        for (i2 = i1 + 1; i2 < n_img; i2++)
-          for (i = 0; i < num[i1]; i++) {
-            p1 = list[i1][i2][i].p1;
-            if (p1 > nmax || tim[i1][p1] > 0)
-              continue;
+      for (i2 = i1 + 1; i2 < n_img; i2++)
+        for (i = 0; i < num[i1]; i++) {
+          p1 = list[i1][i2][i].p1;
+          if (p1 > nmax || tim[i1][p1] > 0)
+            continue;
 
-            /* take only unambigous pairs */
-            if (list[i1][i2][i].n != 1)
-              continue;
+          /* take only unambiguous pairs */
+          if (list[i1][i2][i].n != 1)
+            continue;
 
-            p2 = list[i1][i2][i].p2[0];
-            if (p2 > nmax || tim[i2][p2] > 0)
-              continue;
+          p2 = list[i1][i2][i].p2[0];
+          if (p2 > nmax || tim[i2][p2] > 0)
+            continue;
 
+          if (list[i1][i2][i].dist[0] != 0)
             corr = list[i1][i2][i].corr[0] / list[i1][i2][i].dist[0];
-
-            if (corr > corrmin) {
-              con0[match0].p[i1] = p1;
-              con0[match0].p[i2] = p2;
-              con0[match0++].corr = corr;
-            }
+          else
+            for (n = 0; n < n_img; n++)
+              con0[match0].p[n] = -2;
+            con0[match0].p[i1] = p1;
+            con0[match0].p[i2] = p2;
+            con0[match0++].corr = corr;
+            con0[match0].p[i1] = p1;
+            con0[match0].p[i2] = p2;
+            con0[match0++].corr = corr;
           }
-      }
+        }
     }
     /* -----------------------------------------------------------------------
      */
@@ -395,7 +395,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   } else {
     snprintf(buf, sizeof(buf),
             "%d consistent quadruplets(red), %d triplets(green) and %d "
-            "unambigous pairs",
+            "unambiguous pairs",
             match4, match3, match2);
     puts(buf);
   }
