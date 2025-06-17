@@ -18,7 +18,7 @@ Routines contained:    	many ...
 ****************************************************************************/
 #include "src_c/ptv.h"
 
-#define nmax 20000
+#define NMAX 20000
 
 /*  global declarations for ptv  */
 /*-------------------------------------------------------------------------*/
@@ -92,16 +92,16 @@ Interior I[4], sI[4];   /* interior orientation */
 Glass G[4], sG[4];      /* glass orientation */
 ap_52 ap[4], sap[4];    /* add. parameters k1,k2,k3,p1,p2,scx,she */
 mm_np mmp;              /* n-media parameters */
-target pix[4][nmax];    /* target pixel data */
+target pix[4][NMAX];    /* target pixel data */
 target pix0[4][4];      /* pixel data for man_ori points */
 
 target *t4[4][4];
 int nt4[4][4];
 
-coord_2d crd[4][nmax]; /* (distorted) metric coordinates */
-coord_2d geo[4][nmax]; /* corrected metric coordinates */
+coord_2d crd[4][NMAX]; /* (distorted) metric coordinates */
+coord_2d geo[4][NMAX]; /* corrected metric coordinates */
 coord_3d fix[4096];    /* testfield points coordinates */
-n_tupel con[nmax];     /* list of correspondences */
+n_tupel con[NMAX];     /* list of correspondences */
 
 corres *c4[4];
 trackparameters tpar; /* tracking parameters */
@@ -1071,7 +1071,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       }
 
 
-      if (num[i] > nmax)
+      if (num[i] > NMAX)
         exit(1);
     }
 

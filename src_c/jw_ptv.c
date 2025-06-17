@@ -27,7 +27,7 @@ See the file license.txt for copying permission.
 #include <crtdbg.h>  // only for vc2010
 #endif
 
-#define nmax 20240
+#define NMAX 20240
 #define kMaxCorrespondences 20240
 
 /*  global declarations for ptv  */
@@ -105,16 +105,16 @@ Interior I[4], sI[4];   /* interior orientation */
 Glass G[4], sG[4];      /* glass orientation */
 ap_52 ap[4], sap[4];    /* add. parameters k1,k2,k3,p1,p2,scx,she */
 mm_np mmp;              /* n-media parameters */
-target pix[4][nmax];    /* target pixel data */
+target pix[4][NMAX];    /* target pixel data */
 target pix0[4][12];     /* pixel data for man_ori points */
 
 target *t4[4][4];
 int nt4[4][4];
 
-coord_2d crd[4][nmax]; /* (distorted) metric coordinates */
-coord_2d geo[4][nmax]; /* corrected metric coordinates */
+coord_2d crd[4][NMAX]; /* (distorted) metric coordinates */
+coord_2d geo[4][NMAX]; /* corrected metric coordinates */
 n_tupel con[kMaxCorrespondences];  /* list of correspondences */
-n_tupel con[nmax];  /* list of correspondences */
+n_tupel con[NMAX];  /* list of correspondences */
 
 corres *c4[4];
 trackparameters tpar; /* tracking parameters */
@@ -142,7 +142,7 @@ int init_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
 #if (_MSC_VER >= 1500 && _DEBUG)
   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF |
-                 _CRTDBG_LEAK_CHECK_DF); // only for debuggibg with vc2010
+                 _CRTDBG_LEAK_CHECK_DF);  // only for debuggibg with vc2010
 #endif
   puts("\n Multimedia Particle Positioning and Tracking Software \n");
 
@@ -158,8 +158,8 @@ int init_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     fclose(fpp);
   }
 
-  /*	read from main parameter file  */
-  fpp = fopen_rp("parameters/ptv.par"); // replaced fopen_r, ad holten 12-2012
+  /* read from main parameter file  */
+  fpp = fopen_rp("parameters/ptv.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
 
@@ -185,7 +185,7 @@ int init_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   /* read illuminated layer data */
   fpp = fopen_rp(
-      "parameters/criteria.par"); // replaced fopen_r, ad holten 12-2012
+      "parameters/criteria.par");  // replaced fopen_r, ad holten 12-2012
   if (!fpp)
     return TCL_OK;
 
@@ -424,7 +424,7 @@ int pre_processing_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   for (i = 0; i < 14; i++)
     fscanf(fpp, "%d", &mask); /*checkmark for subtract mask */
-  fscanf(fpp, "%511s\n", img_mask_path);
+  fscanf(fpp, "%499s\n", img_mask_path);
   fclose(fpp);
 
   /*read mask names*/
@@ -708,16 +708,19 @@ int determination_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   Tcl_Eval(interp, ".text insert 2 $tbuf");
 
   /* Beat Mai 2007 to set the variable examine for mulit-plane calibration */
-  fp1 =
-      fopen_rp("parameters/examine.par"); // replaced fopen_r, ad holten 12-2012
+  // replaced fopen_r, ad holten 12-2012
+  fp1 = fopen_rp("parameters/examine.par");
+
   if (!fp1)
     return TCL_OK;
   fscanf(fp1, "%d\n", &dummy);
   fclose(fp1);
+  /* set examine variable */
   if (dummy == 1)
     examine = 4;
-  else
+  else {
     examine = 0;
+  }
 
   fp1 = fopen(res_name, "w");
   if (!fp1) {
@@ -851,8 +854,8 @@ int determination_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   fclose(fp1);
 
   // Beat Mai 2010: now we should open the file db_is.* again, check
-  //				  if it has exactly two points, rescale them, write them
-  //again and close the file.
+  // if it has exactly two points, rescale them, write them
+  // again and close the file.
   if ((argv[1]) > 0) {
     if (atoi(argv[1]) == 3) {
       dumbbell = 1;
@@ -861,14 +864,14 @@ int determination_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   }
   if (dumbbell == 1) {
     fpp = fopen_rp(
-        "parameters/dumbbell.par"); // replaced fopen, ad holten, 12-2012
+        "parameters/dumbbell.par");  // replaced fopen, ad holten, 12-2012
     if (!fpp)
       return TCL_OK;
     fscanf(fpp, "%lf", &eps0);
     fscanf(fpp, "%lf", &db_scale);
     fclose(fpp);
 
-    fpp = fopen_rp(res_name); // replaced fopen, ad holten, 12-2012
+    fpp = fopen_rp(res_name);  // replaced fopen, ad holten, 12-2012
     if (!fpp)
       return TCL_OK;
     fscanf(fpp, "%d\n", &match);
@@ -879,24 +882,24 @@ int determination_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
              &a2[1], &a2[2], &a2[3]);
       // // now adapt x,y,z
       // /* dist=pow(pow(x2-x1,2.)+pow(y2-y1,2.)+pow(z2-z1,2.),0.5);
-      //	  mx=0.5*(x1+x2);
-      //	  my=0.5*(y1+y2);
-      //	  mz=0.5*(z1+z2);
-      //	  nx=(x2-x1)/dist;
-      //	  ny=(y2-y1)/dist;
-      //	  nz=(z2-z1)/dist;
-      //	  x1=mx-0.5*db_scale*nx;
-      //	  x2=mx+0.5*db_scale*nx;
-      //	  y1=my-0.5*db_scale*ny;
-      //	  y2=my+0.5*db_scale*ny;
-      //	  z1=mz-0.5*db_scale*nz;
-      //	  z2=mz+0.5*db_scale*nz;
+      //    mx=0.5*(x1+x2);
+      //    my=0.5*(y1+y2);
+      //    mz=0.5*(z1+z2);
+      //    nx=(x2-x1)/dist;
+      //    ny=(y2-y1)/dist;
+      //    nz=(z2-z1)/dist;
+      //    x1=mx-0.5*db_scale*nx;
+      //    x2=mx+0.5*db_scale*nx;
+      //    y1=my-0.5*db_scale*ny;
+      //    y2=my+0.5*db_scale*ny;
+      //    z1=mz-0.5*db_scale*nz;
+      //    z2=mz+0.5*db_scale*nz;
       // */
 
       // // check if reasonable
       // /* dist=pow(pow(x2-x1,2.)+pow(y2-y1,2.)+pow(z2-z1,2.),0.5);
       // if (fabs(dist-38)>1){
-      //	  match=0;
+      // match=0;
       // }*/
 
       // check if all quadruplets or triplets
@@ -911,8 +914,9 @@ int determination_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       if (checksum_1 > 1 || checksum_2 > 1)
         match = 0;
       // end of check if all quadruplets or triplets
-    } else
+    } else {
       match = 0;
+    }
 
     fclose(fpp);
     fpp = fopen(res_name, "w");
@@ -922,8 +926,9 @@ int determination_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
               a1[0], a1[1], a1[2], a1[3]);
       fprintf(fpp, " %4d %9.3f %9.3f %9.3f %4d %4d %4d %4d\n", i2, x2, y2, z2,
               a2[0], a2[1], a2[2], a2[3]);
-    } else
+    } else {
       fprintf(fpp, "%4d\n", 0);
+    }
     fclose(fpp);
   }
   // end of dumbbell treatment
@@ -933,7 +938,7 @@ int determination_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   rmsZ = sqrt(rmsZ / match);
   mean_sigma0 = sqrt(mean_sigma0 / match);
 
-  sprintf(buf,
+  snprintf(buf, sizeof(buf),
           "Match: %d, => rms = %4.2f micron, rms_x,y,z = %5.3f/%5.3f/%5.3f mm",
           match, mean_sigma0 * 1000, rmsX, rmsY, rmsZ);
   puts(buf);
@@ -1201,17 +1206,15 @@ int restore_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   fscanf(fpp, "%d\n", &n_img);
   for (i = 0; i < n_img; i++) {
-    fscanf(fpp, "%s\n", img_name[i]);
-    fscanf(fpp, "%s\n", img_cal[i]);
+    fscanf(fpp, "%511s\n", img_name[i]);
+    fscanf(fpp, "%511s\n", img_cal[i]);
   }
   fclose(fpp);
 
-  /*	create file names  */
+  /*  create file names  */
   for (i = 0; i < n_img; i++) {
-    strcpy(img_ori[i], img_cal[i]);
-    strcat(img_ori[i], ".ori");
-    strcpy(img_addpar[i], img_cal[i]);
-    strcat(img_addpar[i], ".addpar");
+    snprintf(img_ori[i], sizeof(img_ori[i]), "%s.ori", img_cal[i]);
+    snprintf(img_addpar[i], sizeof(img_addpar[i]), "%s.addpar", img_cal[i]);
   }
 
   // -- changed syntax, ad holten 12-2012
@@ -1302,105 +1305,98 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   /* Beat Mai 2007 to set the variable examine for mulit-plane calibration*/
   fp1 = fopen_rp(
-      "parameters/examine.par"); // replaced fopen_r, ad holten, 12-2012
+      "parameters/examine.par");  // replaced fopen_r, ad holten, 12-2012
   if (!fp1)
     return TCL_OK;
   fscanf(fp1, "%d\n", &dummy);
   fscanf(fp1, "%d\n", &multi);
   fclose(fp1);
-  if (dummy == 1)
+  if (dummy == 1) {
     examine = 4;
-  else
+  } else {
     examine = 0;
+  }
 
   /* Oswald Juni 2008 accept pairs------------------------------- */
 
   fp1 = fopen_rp(
-      "parameters/cal_ori.par"); // replaced fopen_r, ad holten, 12-2012
+      "parameters/cal_ori.par");  // replaced fopen_r, ad holten, 12-2012
   if (!fp1)
     return TCL_OK;
 
-  fscanf(fp1, "%s\n", fixp_name);
+  fscanf(fp1, "%511s\n", fixp_name);
   for (i = 0; i < 4; i++) {
-    fscanf(fp1, "%s\n", img_name[i]);
-    fscanf(fp1, "%s\n", img_ori0[i]);
+    fscanf(fp1, "%511s\n", img_name[i]);
+    fscanf(fp1, "%511s\n", img_ori0[i]);
   }
   fscanf(fp1, "%d\n",
-         &tiff_flag); // ad holten 12-2012, 2x bug repaired, was fpp
+         &tiff_flag);  //  ad holten 12-2012, 2x bug repaired, was fpp
   fscanf(fp1, "%d\n", &pair_flag);
-  fscanf(fp1, "%d\n", &chfield); // added, ad holten 12-2012
+  fscanf(fp1, "%d\n", &chfield);  //  added, ad holten 12-2012
   fclose(fp1);
 
-  // if (pair_flag==1) {
-  //	  int OSWALDDUMMY=1;
-  //}
-  // else {
-  //	  int OSWALDDUMMY=0;
-  //}
-
-  ///////////////////////////////////////////////////////////////////////////////
 
   // clearing all objects in the objects list
   if (sel == 1 || sel == 2 || sel == 6)
     clear_drawnobjectslist(n_img);
 
   switch (sel) {
-  case 1: /*	read calibration parameter file  */
+  case 1: /*  read calibration parameter file  */
     // 10 lines commented out, file already parsed, ad holten 12-2012
-    // 		fp1 = fopen_r ("parameters/cal_ori.par");
-    // 		fscanf (fp1,"%s\n", fixp_name);
-    // 		for (i=0; i<4; i++) {
-    //			fscanf (fp1, "%s\n", img_name[i]);
-    // 			fscanf (fp1, "%s\n", img_ori0[i]);
-    // 		}
-    // 		fscanf (fpp, "%d\n", &tiff_flag);
-    // 		fscanf (fpp, "%d\n", &pair_flag);
-    // 		fscanf (fp1, "%d\n", &chfield);
-    // 		fclose (fp1);
+    // fp1 = fopen_r ("parameters/cal_ori.par");
+    // fscanf (fp1,"%s\n", fixp_name);
+    // for (i=0; i<4; i++) {
+    //     fscanf (fp1, "%s\n", img_name[i]);
+    //     fscanf (fp1, "%s\n", img_ori0[i]);
+    // }
+    // fscanf (fpp, "%d\n", &tiff_flag);
+    // fscanf (fpp, "%d\n", &pair_flag);
+    // fscanf (fp1, "%d\n", &chfield);
+    // fclose (fp1);
 
-    /*	create file names  */
+    /*  create file names  */
     // replaced by sprintf, ad holten 12-2012
-    //		for (i=0; i<n_img; i++) {
-    //			strcpy (img_ori[i], img_name[i]);
-    //			strcat (img_ori[i], ".ori");
-    //			strcpy (img_addpar0[i], img_name[i]);
-    //			strcat (img_addpar0[i], ".addpar0");
-    //			strcpy (img_addpar[i], img_name[i]);
-    //			strcat (img_addpar[i], ".addpar");
-    //			strcpy (img_hp_name[i], img_name[i]);
-    //			strcat (img_hp_name[i], "_hp");
-    //		}
-    //		strcpy (safety[0], "safety_0");
-    //		strcat (safety[0], ".ori");
-    //		strcpy (safety[1], "safety_1");
-    //		strcat (safety[1], ".ori");
-    //		strcpy (safety[2], "safety_2");
-    //		strcat (safety[2], ".ori");
-    //		strcpy (safety[3], "safety_3");
-    //		strcat (safety[3], ".ori");
-    //		strcpy (safety_addpar[0], "safety_0");
-    //		strcat (safety_addpar[0], ".addpar");
-    //		strcpy (safety_addpar[1], "safety_1");
-    //		strcat (safety_addpar[1], ".addpar");
-    //		strcpy (safety_addpar[2], "safety_2");
-    //		strcat (safety_addpar[2], ".addpar");
-    //		strcpy (safety_addpar[3], "safety_3");
-    //		strcat (safety_addpar[3], ".addpar");
+    // for (i=0; i<n_img; i++) {
+    //     strcpy (img_ori[i], img_name[i]);
+    //     strcat (img_ori[i], ".ori");
+    //     strcpy (img_addpar0[i], img_name[i]);
+    //     strcat (img_addpar0[i], ".addpar0");
+    //     strcpy (img_addpar[i], img_name[i]);
+    //     strcat (img_addpar[i], ".addpar");
+    //     strcpy (img_hp_name[i], img_name[i]);
+    //     strcat (img_hp_name[i], "_hp");
+    // }
+    // strcpy (safety[0], "safety_0");
+    // strcat (safety[0], ".ori");
+    // strcpy (safety[1], "safety_1");
+    // strcat (safety[1], ".ori");
+    // strcpy (safety[2], "safety_2");
+    // strcat (safety[2], ".ori");
+    // strcpy (safety[3], "safety_3");
+    // strcat (safety[3], ".ori");
+    // strcpy (safety_addpar[0], "safety_0");
+    // strcat (safety_addpar[0], ".addpar");
+    // strcpy (safety_addpar[1], "safety_1");
+    // strcat (safety_addpar[1], ".addpar");
+    // strcpy (safety_addpar[2], "safety_2");
+    // strcat (safety_addpar[2], ".addpar");
+    // strcpy (safety_addpar[3], "safety_3");
+    // strcat (safety_addpar[3], ".addpar");
 
     for (i = 0; i < n_img; i++) {
-      sprintf(img_ori[i], "%s.ori", img_name[i]);
-      sprintf(img_addpar0[i], "%s.addpar0", img_name[i]);
-      sprintf(img_addpar[i], "%s.addpar", img_name[i]);
-      sprintf(img_hp_name[i], "%s_hp", img_name[i]);
-      sprintf(safety[i], "safety_%d.ori", i);
-      sprintf(safety_addpar[i], "safety_%d.addpa", i);
+      snprintf(img_ori[i], sizeof(img_ori[i]), "%s.ori", img_name[i]);
+      snprintf(img_addpar0[i], sizeof(img_addpar0[i]), "%s.addpar0", img_name[i]);
+      snprintf(img_addpar[i], sizeof(img_addpar[i]), "%s.addpar", img_name[i]);
+      snprintf(img_hp_name[i], sizeof(img_hp_name[i]), "%s_hp", img_name[i]);
+      snprintf(safety[i], sizeof(safety[i]), "safety_%d.ori", i);
+      snprintf(safety_addpar[i], sizeof(safety_addpar[i]), "safety_%d.addpa", i);
     }
 
     for (i = 0; i < n_img; i++) {
       // zoom_x[i] = imx/2, zoom_y[i] = imy/2, zoom_f[i] = 1;
       read_image(interp, img_name[i], img[i]);
 
-      sprintf(val, "camcanvas %d", i + 1);
+      snprintf(val, sizeof(val), "camcanvas %d", i + 1);
       Tcl_Eval(interp, val);
 
       // Why calling tclimg2cimg()? Thsi will change alpha values from 255 to 40
@@ -1408,7 +1404,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       //    img_handle = Tk_FindPhoto( interp, "temp");
       //    Tk_PhotoGetImage (img_handle, &img_block);
       //    tclimg2cimg (interp, img[i], &img_block);
-      sprintf(val, "newimage %d %f %f %d %d", i + 1, 0.5, 0.5, 1, 0);
+      snprintf(val, sizeof(val), "newimage %d %f %f %d %d", i + 1, 0.5, 0.5, 1, 0);
       Tcl_Eval(interp, val);
     }
     break;
@@ -1432,8 +1428,8 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       snprintf(buf, sizeof(buf), "image %d: %d,  ", i + 1, num[i]);
       snprintf(val + strlen(val), sizeof(val) - strlen(val), "%s", buf);
 
-      if (num[i] > nmax) {
-        printf("Aborted, too many targets detected!\n"); // ad holten, 12-2012
+      if (num[i] > NMAX) {
+        printf("Aborted, too many targets detected!\n");  // ad holten, 12-2012
         exit(1);
       }
     }
@@ -1467,11 +1463,11 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     pp4 = 0;
 
     for (i = 0; i < n_img; i++) {
-      sprintf(buf, "%d targets remain", num[i]);
+      snprintf(buf, sizeof(buf), "%d targets remain", num[i]);
       puts(buf);
     }
     fp1 = fopen_rp(
-        "parameters/man_ori.par"); // replaced fopen_r, ad holten, 12-2012
+        "parameters/man_ori.par");  // replaced fopen_r, ad holten, 12-2012
     if (!fp1)
       break;
 
@@ -1590,8 +1586,8 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
       /* raw orientation with 4 points */
       raw_orient_v3(Ex[i], I[i], G[i], ap[i], mmp, 4, fix4, crd0[i], &Ex[i],
-                    &G[i], 0); // Beat Nov 2008
-      sprintf(filename, "raw%d.ori", i);
+                    &G[i], 0);  // Beat Nov 2008
+      snprintf(filename, sizeof(filename), "raw%d.ori", i);
       write_ori(Ex[i], I[i], G[i], filename);
 
       /* sorting of detected points by back-projection */
@@ -1604,8 +1600,8 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       for (j = 0; j < nfix; j++) {
         if (pix[i][j].pnr < 0)
           continue;
-        intx1 = (int)pix[i][j].x;
-        inty1 = (int)pix[i][j].y;
+        intx1 = (int)pix[i][j].x;  // NOLINT
+        inty1 = (int)pix[i][j].y;  // NOLINT
 
         drawcross(interp, intx1, inty1, cr_sz, i, "white");
         draw_pnr(interp, intx1, inty1, fix[j].pnr, i, "white");
@@ -1615,7 +1611,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     /* dump dataset for rdb */
     if (examine == 4) {
       /* create filename for dumped dataset */
-      sprintf(filename, "dump_for_rdb");
+      snprintf(filename, sizeof(filename), "dump_for_rdb");
       fp1 = fopen(filename, "w");
 
       /* write # of points to file */
@@ -1623,17 +1619,17 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
       /* write point and image coord to file */
       for (i = 0; i < nfix; i++) {
-        fprintf(fp1, "%4d %10.3f %10.3f %10.3f   %d	", fix[i].pnr, fix[i].x,
+        fprintf(fp1, "%4d %10.3f %10.3f %10.3f   %d    ", fix[i].pnr, fix[i].x,
                 fix[i].y, fix[i].z, 0);
         for (i_img = 0; i_img < n_img; i_img++) {
           if (pix[i_img][i].pnr >= 0) {
             /* transform pixel coord to metric */
             pixel_to_metric(pix[i_img][i].x, pix[i_img][i].y, imx, imy, pix_x,
                             pix_y, &crd[i_img][i].x, &crd[i_img][i].y, chfield);
-            fprintf(fp1, "%4d %8.5f %8.5f	  ", pix[i_img][i].pnr,
+            fprintf(fp1, "%4d %8.5f %8.5f  ", pix[i_img][i].pnr,
                     crd[i_img][i].x, crd[i_img][i].y);
           } else {
-            fprintf(fp1, "%4d %8.5f %8.5f	  ", pix[i_img][i].pnr, 0.0, 0.0);
+            fprintf(fp1, "%4d %8.5f %8.5f  ", pix[i_img][i].pnr, 0.0, 0.0);
           }
         }
         fprintf(fp1, "\n");
@@ -1644,10 +1640,10 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     break;
 
   case 16:
-    puts("Sort grid points using files"); // Beat Jan 2011
+    puts("Sort grid points using files");  // Beat Jan 2011
     for (i = 0; i < n_img; i++) {
       /* read control point coordinates for man_ori points */
-      fp1 = fopen_rp(fixp_name); // replaced fopen, ad holten, 12-2012
+      fp1 = fopen_rp(fixp_name);  // replaced fopen, ad holten, 12-2012
       if (!fp1)
         return TCL_OK;
       k = 0;
@@ -1689,8 +1685,8 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
       /* raw orientation with 4 points */
       raw_orient_v3(Ex[i], I[i], G[i], ap[i], mmp, 4, fix4, crd0[i], &Ex[i],
-                    &G[i], 0); // Beat Nov 2008
-      sprintf(filename, "raw%d.ori", i);
+                    &G[i], 0);  // Beat Nov 2008
+      snprintf(filename, sizeof(filename), "raw%d.ori", i);
       write_ori(Ex[i], I[i], G[i], filename);
 
       /* sorting of detected points by back-projection */
@@ -1839,25 +1835,30 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
           fclose(fp1);
           /* read metric image coordinates */
           // sprintf (filename, "resect_%d.crd%d", i_img, n);
-          snprintf(filename, sizeof(filename), "%s%d.tif.crd", multi_filename[n], header_serializer_get_value(i,argc)); // Added missing argument for %d
+          snprintf(
+              filename,
+              sizeof(filename),
+              "%s%d.tif.crd",
+              multi_filename[n],
+              header_serializer_get_value(i, argc));  //  Added missing argument for %d
           printf("reading file: %s\n", filename);
-          fp1 = fopen_rp(filename); // replaced fopen by fopen_rp and
+          fp1 = fopen_rp(filename);  // replaced fopen by fopen_rp and
           if (!fp1)
-            break; // added this line, ad holten, 01-2013
+            break;  // added this line, ad holten, 01-2013
           for (i = nfix; i < nfix + k; i++)
             fscanf(fp1, "%d %lf %lf", &crd[i_img][i].pnr, &crd[i_img][i].x,
                    &crd[i_img][i].y);
           nfix += k;
           fclose(fp1);
         }
-        if (n < planes) { // added, ad holten, 01-2013
+        if (n < planes) {  // added, ad holten, 01-2013
           printf("Action aborted. (Error in multi_planes.par ?)\n");
           return TCL_OK;
         }
 
         /* resection */
         /*Beat Mai 2007*/
-        sprintf(filename, "raw%d.ori", i_img);
+        snprintf(filename, sizeof(filename), "raw%d.ori", i_img);
         read_ori(&Ex[i_img], &I[i_img], &G[i_img], filename);
         fp1 = fopen("addpar.raw", "r");
 

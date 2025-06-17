@@ -131,7 +131,7 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
   fscanf(fpp, "%d", &gvthres[2]);      /* threshold for binarization 3.image */
   fscanf(fpp, "%d", &gvthres[3]);      /* threshold for binarization 4.image */
   fscanf(fpp, "%d", &disco);           /* threshold value for discontinuity */
-  fscanf(fpp, "%d%d", &nnmin, &nnmax); /* min. and max. number of  */
+  fscanf(fpp, "%d%d", &nnmin, &nNMAX); /* min. and max. number of  */
   fscanf(fpp, "%d%d", &nxmin, &nxmax); /* pixels per target, */
   fscanf(fpp, "%d%d", &nymin, &nymax); /* abs, in x, in y    */
   fscanf(fpp, "%d", &sumg_min);        /* min. sumg          */
@@ -234,7 +234,7 @@ void targ_rec(Tcl_Interp *interp, unsigned char *img0, unsigned char *img,
         nx = xb - xa + 1;
         ny = yb - ya + 1;
 
-        if (numpix >= nnmin && numpix <= nnmax && nx >= nxmin && nx <= nxmax &&
+        if (numpix >= nnmin && numpix <= nNMAX && nx >= nxmin && nx <= nxmax &&
             ny >= nymin && ny <= nymax && sumg > sumg_min) {
           pix[n_targets].n = numpix;
           pix[n_targets].nx = nx;
@@ -278,7 +278,7 @@ void simple_connectivity(Tcl_Interp *interp, unsigned char *img0,
   register unsigned char gv, gvref;
   register int i, j, m;
   int n = 0, n_wait = 0, n_targets = 0, sumg, sumg_min, numpix, thres, cr_sz;
-  int nnmin, nnmax, nx, ny, nxmin, nxmax, nymin, nymax;
+  int nnmin, nNMAX, nx, ny, nxmin, nxmax, nymin, nymax;
   int xa, ya, xb, yb, x4[4], y4[4], xn, yn;
   double x, y;
   FILE *fpp;
@@ -295,7 +295,7 @@ void simple_connectivity(Tcl_Interp *interp, unsigned char *img0,
   fscanf(fpp, "%*d");        //
   fscanf(fpp, "%d", &n);     /* threshold value for discontinuity */
   fscanf(fpp, "%d%d", &nnmin,
-         &nnmax);  /* min. and max. number of */
+         &nNMAX);  /* min. and max. number of */
   fscanf(fpp, "%d%d", &nxmin,
          &nxmax);  /* pixels per target, */
   fscanf(fpp, "%d%d", &nymin,
@@ -377,7 +377,7 @@ void simple_connectivity(Tcl_Interp *interp, unsigned char *img0,
         nx = xb - xa + 1;
         ny = yb - ya + 1;
 
-        if (numpix >= nnmin && numpix <= nnmax && nx >= nxmin && nx <= nxmax &&
+        if (numpix >= nnmin && numpix <= nNMAX && nx >= nxmin && nx <= nxmax &&
             ny >= nymin && ny <= nymax && sumg > sumg_min) {
           pix[n_targets].n = numpix;
           pix[n_targets].nx = nx;

@@ -19,7 +19,7 @@ Copyright (c) 1990-2011 ETH Zurich
 See the file license.txt for copying permission.
 */
 
-#include "ptv.h"
+#include "ptv.h"  // NOLINT
 
 /* #define MAXCAND 100 */
 
@@ -31,7 +31,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   int i, j, k, l, m, n, o, i1, i2, i3;
   int count, match0 = 0, match4 = 0, match3 = 0, match2 = 0, match1 = 0;
   int p1, p2, p3, p4, p31, p41, p42, pt1;
-  int tim[4][nmax], intx, inty;
+  int tim[4][NMAX], intx, inty;
   double xa12, ya12, xb12, yb12, X, Y, Z, corr;
   candidate cand[MAXCAND];
   n_tupel *con0;
@@ -43,15 +43,15 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   /* allocate memory for lists of correspondences */
   for (i1 = 0; i1 < n_img - 1; i1++)
     for (i2 = i1 + 1; i2 < n_img; i2++)
-      list[i1][i2] = (correspond *)malloc(num[i1] * sizeof(correspond));
+      list[i1][i2] = (correspond *)malloc(num[i1] * sizeof(correspond));  // NOLINT
 
-  con0 = (n_tupel *)malloc(4 * nmax * sizeof(n_tupel));
+  con0 = (n_tupel *)malloc(4 * NMAX * sizeof(n_tupel));  // NOLINT
 
   /* ----------------------------------------------------------------------- */
 
   printf("in corres zmin0: %f, zmax0: %f\n", Zmin_lay[0], Zmax_lay[0]);
 
-  /*	initialize ...	*/
+  /*  initialize ...  */
   snprintf(buf, sizeof(buf), "Establishing correspondences");
   Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
   Tcl_Eval(interp, ".text delete 2");
@@ -68,7 +68,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
         list[i1][i2][i].n = 0;
       }
 
-  for (i = 0; i < nmax; i++) {
+  for (i = 0; i < NMAX; i++) {
     con0[i].corr = 0;
     for (j = 0; j < 4; j++)
       con0[i].p[j] = -1;
@@ -136,15 +136,15 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
     }
   // commented out, ad holten, 12-2012
   // /* repair memory fault (!?) */
-  // for (j=0; j<4; j++) for (i=0; i<nmax; i++) tim[j][i] = 0;
+  // for (j=0; j<4; j++) for (i=0; i<NMAX; i++) tim[j][i] = 0;
 
   // but tested, to be sure that everything is alright. WILL BE REMOVED LATER
   for (j = 0; j < 4; j++)
-    for (i = 0; i < nmax; i++)
+    for (i = 0; i < NMAX; i++)
       if (tim[j][i] != 0) {
         printf(">>>>>>>>>> correspondences_4: ERROR on line 144, CHECK CODE "
                "<<<<<<<<<<<<<<<< \n");
-        i = nmax;
+        i = NMAX;
         j = 4;
       }
 
@@ -183,7 +183,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
                         con0[match0].p[2] = p3;
                         con0[match0].p[3] = p4;
                         con0[match0++].corr = corr;
-                        if (match0 == 4 * nmax) { /* security */
+                        if (match0 == 4 * NMAX) { /* security */
                           printf("Overflow in correspondences:");
                           printf(" > %d matches\n", match0);
                           i = num[0];
@@ -241,16 +241,16 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
         for (i3 = i2 + 1; i3 < n_img; i3++)
           for (i = 0; i < num[i1]; i++) {
             p1 = list[i1][i2][i].p1;
-            if (p1 > nmax || tim[i1][p1] > 0)
+            if (p1 > NMAX || tim[i1][p1] > 0)
               continue;
 
             for (j = 0; j < list[i1][i2][i].n; j++)
               for (k = 0; k < list[i1][i3][i].n; k++) {
                 p2 = list[i1][i2][i].p2[j];
-                if (p2 > nmax || tim[i2][p2] > 0)
+                if (p2 > NMAX || tim[i2][p2] > 0)
                   continue;
                 p3 = list[i1][i3][i].p2[k];
-                if (p3 > nmax || tim[i3][p3] > 0)
+                if (p3 > NMAX || tim[i3][p3] > 0)
                   continue;
 
                 for (m = 0; m < list[i2][i3][p2].n; m++) {
@@ -302,14 +302,14 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
     }
 
     match3 = match - match4;
-    sprintf(buf, "%d consistent quadruplets, %d triplets ", match4, match3);
+    snprintf(buf, sizeof(buf), "%d consistent quadruplets, %d triplets ", match4, match3);
     puts(buf);
 
-    ///* repair artifact (?) */			// commented out ad holten,
-    ///12-2012
+    ///* repair artifact (?) */            // commented out ad holten,
+    // /12-2012
     // if (n_img == 3)
-    //	for (i=0; i<match; i++) con[i].p[3] = -1;
-    if (n_img == 3) { // added for a test (WILL BE REMOVED LATER)
+    // for (i=0; i<match; i++) con[i].p[3] = -1;
+    if (n_img == 3) {  // added for a test (WILL BE REMOVED LATER)
       for (i = 0; i < match; i++)
         if (con[i].p[3] != -1) {
           printf(">>>>>>>>>>>>>> correspondences_4: ERROR on line 144, CHECK "
@@ -325,7 +325,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   // search consistent pairs :  12, 13, 14, 23, 24, 34
 
   // only if an object model is available or if only 2 images are used
-  // if (1<2 && n_img>1 && allCam_flag==0) {		//	removed 1<2, ad holten,
+  // if (1<2 && n_img>1 && allCam_flag==0) {        //  removed 1<2, ad holten,
   // 12-2012
   if (n_img > 1 && allCam_flag == 0) {
     puts("Search pairs");
@@ -338,7 +338,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
         for (i2 = i1 + 1; i2 < n_img; i2++)
           for (i = 0; i < num[i1]; i++) {
             p1 = list[i1][i2][i].p1;
-            if (p1 > nmax || tim[i1][p1] > 0)
+            if (p1 > NMAX || tim[i1][p1] > 0)
               continue;
 
             /* take only unambigous pairs */
@@ -346,7 +346,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
               continue;
 
             p2 = list[i1][i2][i].p2[0];
-            if (p2 > nmax || tim[i2][p2] > 0)
+            if (p2 > NMAX || tim[i2][p2] > 0)
               continue;
 
             corr = list[i1][i2][i].corr[0] / list[i1][i2][i].dist[0];
@@ -408,7 +408,7 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
   /* give each used pix the correspondence number */
   for (i = 0; i < match; i++)
     for (j = 0; j < n_img; j++)
-      if (con[i].p[j] > -1) { // Bug, detected in Nov 2011 by Koni&Beat
+      if (con[i].p[j] > -1) {  // Bug, detected in Nov 2011 by Koni&Beat
         p1 = geo[j][con[i].p[j]].pnr;
         if (p1 > -1 && p1 < num[j])
           pix[j][p1].tnr = i;
@@ -422,8 +422,8 @@ void correspondences_4(Tcl_Interp *interp, const char **argv) {
       get_tclzoomparms(interp, &zoompar[i], i);
 
     // for (i=0; i<4; i++) {
-    //	zfac[i] = zoom_f[i];
-    //	if (zoom_f[i]<0) zoom_f[i] = 1;
+    // zfac[i] = zoom_f[i];
+    //  if (zoom_f[i]<0) zoom_f[i] = 1;
     //}
     for (i = 0; i < match4; i++) { /* red crosses for quadruplets */
       for (j = 0; j < n_img; j++) {

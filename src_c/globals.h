@@ -15,7 +15,7 @@ typedef bool BOOL;   // Typedef BOOL from the standard bool
 #endif
 
 
-#define nmax 20240
+#define NMAX 20240
 #define MAX_IMAGES 4
 #define MAX_TARGETS 20000  // Max number of targets per image
 #define MAX_CANDIDATES 100
@@ -108,10 +108,10 @@ extern  Interior  I[];                          /* interior orientation */
 extern  Glass     G[];                          /* glass orientation */
 extern  ap_52     ap[];                         /* add. parameters */
 extern  mm_np     mmp;                          /* 3-media parameters */
-extern  target    pix[4][nmax];                 /* target pixel data */
+extern  target    pix[4][NMAX];                 /* target pixel data */
 extern  target    pix0[4][12];                  /* pixel data for man_ori points */
-extern  coord_2d  crd[4][nmax];                 /* (distorted) metric coordinates */
-extern  coord_2d  geo[4][nmax];                 /* corrected metric coordinates */
+extern  coord_2d  crd[4][NMAX];                 /* (distorted) metric coordinates */
+extern  coord_2d  geo[4][NMAX];                 /* corrected metric coordinates */
 extern  coord_3d  fix[];                        /* testfield points coordinates */
 extern  n_tupel   con[];                        /* list of correspondences */
 extern  mm_LUT    mmLUT[4];                     /* LUT for mm radial displacement */
