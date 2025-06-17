@@ -32,7 +32,7 @@ This guide explains how to use Docker to create a consistent environment for run
         ```bash
         docker run -it --rm \\
             -v "/tmp/.X11-unix:/tmp/.X11-unix" \\
-            -v "/path/to/your/data/directory:/data" \\
+            -v "./test:/data" \\
             -e DISPLAY=$DISPLAY \\
             --user $(id -u):$(id -g) \\
             3dptv-app /data
