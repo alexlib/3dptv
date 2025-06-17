@@ -10,8 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <tcl.h>
-#include <tk.h>
+#include <tcl.h> //NOLINT
+#include <tk.h> //NOLINT
 
 #include "tiff.h"
 #include "tiffio.h"

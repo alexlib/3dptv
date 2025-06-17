@@ -136,10 +136,10 @@ int mouse_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   case 3: /* generate epipolar line segments */
 
     /* get geometric coordinates of nearest point in img[n] */
-    // x = (float) (click_x - imx/2)/zoom_f[n] + zoom_x[n];		changed, ad holten,
+    // x = (float) (click_x - imx/2)/zoom_f[n] + zoom_x[n];        changed, ad holten,
     // 04-2013 y = (float) (click_y - imy/2)/zoom_f[n] + zoom_y[n];
-    x = (double)click_x;
-    y = (double)click_y;
+    x = (double)click_x;  // NOLINT
+    y = (double)click_y;  // NOLINT
 
     pixel_to_metric(x, y, imx, imy, pix_x, pix_y, &x, &y, chfield);
     x -= I[n].xh;
@@ -147,7 +147,7 @@ int mouse_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     correct_brown_affin(x, y, ap[n], &x, &y);
     k = nearest_neighbour_geo(geo[n], num[n], x, y, 0.05);
     if (k == -999) {
-      sprintf(buf, "no point near click coord ! Click again!");
+      snprintf(buf, sizeof(buf), "no point near click coord ! Click again!");
       puts(buf);
       Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
       Tcl_Eval(interp, ".text delete 2");
@@ -162,7 +162,7 @@ int mouse_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
     // drawcross (interp, intx1, inty1, cr_sz+2, n, "BlueViolet");
     drawoval(interp, intx1, inty1, cr_sz + 3, n, "white");
 
-    sprintf(buf, "%d %d %d %d %d\n", pt1, pix[n][pt1].nx, pix[n][pt1].ny,
+    snprintf(buf, sizeof(buf), "%d %d %d %d %d\n", pt1, pix[n][pt1].nx, pix[n][pt1].ny,
             pix[n][pt1].n, pix[n][pt1].sumg);
     puts(buf);
 
@@ -197,20 +197,20 @@ int mouse_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
         img_to_view_coordinates(&intx2, &inty2, xb12, yb12, n);
 
         if (n == 0)
-          sprintf(val, "yellow");
+          snprintf(val, sizeof(val), "yellow");
         if (n == 1)
-          sprintf(val, "green");
+          snprintf(val, sizeof(val), "green");
         if (n == 2)
-          sprintf(val, "red");
+          snprintf(val, sizeof(val), "red");
         if (n == 3)
-          sprintf(val, "blue");
+          snprintf(val, sizeof(val), "blue");
 
         drawvector(interp, intx1, inty1, intx2, inty2, 1, i, val);
 
-        /* center the epipolar line in the view */ // added, ad holten, 04-2013
-        sprintf(val, "panimage %d %f %f", i + 1,
-                (double)(intx1 + intx2) / 2 / imx,
-                (double)(inty1 + inty2) / 2 / imy);
+        /* center the epipolar line in the view */  // added, ad holten, 04-2013
+        snprintf(val, sizeof(val), "panimage %d %f %f", i + 1,
+                ((intx1 + intx2) / 2.0) / imx,
+                ((inty1 + inty2) / 2.0) / imy);
         Tcl_Eval(interp, val);
 
         for (j = 0; j < count; j++) {

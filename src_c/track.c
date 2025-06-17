@@ -25,7 +25,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
                 const char **argv) {
   char val[256], buf[256];
   int i, j, h, k, mm, kk, step, okay = 0, invol = 0;
-  int zaehler1, zaehler2, philf[4][4];
+  int counter1, counter2, philf[4][4];
   int count1 = 0, count2 = 0, count3 = 0, lost = 0, zusatz = 0;
   int intx0, intx1, inty0, inty1;
   int intx2, inty2;
@@ -172,7 +172,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
       /* search in pix for candidates in next time step */
       for (j = 0; j < n_img; j++) {
         // stripped & from philf, ad holten 12-2012
-        zaehler1 = candsearch_in_pix(t4[2][j], nt4[2][j], x1[j], y1[j], xl[j],
+        counter1 = candsearch_in_pix(t4[2][j], nt4[2][j], x1[j], y1[j], xl[j],
                                      xr[j], yu[j], yd[j], philf[j]);
         for (k = 0; k < 4; k++) {
           // p16[j*4+k].ftnr=t4[2][j][philf[j][k]].tnr;
@@ -190,12 +190,12 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
       /* fill and sort candidate struct */
       // stripped & from p16, ad holten 12-2012
-      sortwhatfound(p16, &zaehler1);
-      w = (foundpix *)calloc(zaehler1, sizeof(foundpix));
+      sortwhatfound(p16, &counter1);
+      w = (foundpix *)calloc(counter1, sizeof(foundpix));
 
-      if (zaehler1 > 0)
+      if (counter1 > 0)
         count2++;
-      for (i = 0; i < zaehler1; i++) {
+      for (i = 0; i < counter1; i++) {
         w[i].ftnr = p16[i].ftnr;
         w[i].freq = p16[i].freq;
         for (j = 0; j < n_img; j++)
@@ -205,7 +205,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
       /* ******************************************************* */
       /* check for what was found */
-      for (mm = 0; mm < zaehler1; mm++) /* zaehler1-loop */
+      for (mm = 0; mm < counter1; mm++) /* counter1-loop */
       {
         /* search for found corr of current the corr in next
            with predicted location */
@@ -247,7 +247,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
         /* search for candidates in next time step */
         for (j = 0; j < n_img; j++) {
           // stripped & from philf, ad holten 12-2012
-          zaehler2 = candsearch_in_pix(t4[3][j], nt4[3][j], x2[j], y2[j], xl[j],
+          counter2 = candsearch_in_pix(t4[3][j], nt4[3][j], x2[j], y2[j], xl[j],
                                        xr[j], yu[j], yd[j], philf[j]);
 
           for (k = 0; k < 4; k++) {
@@ -272,12 +272,12 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
         /* fill and sort candidate struct */
 
         // stripped & from p16, ad holten 12-2012
-        sortwhatfound(p16, &zaehler2);
-        wn = (foundpix *)calloc(zaehler2, sizeof(foundpix));
-        if (zaehler2 > 0)
+        sortwhatfound(p16, &counter2);
+        wn = (foundpix *)calloc(counter2, sizeof(foundpix));
+        if (counter2 > 0)
           count3++;
 
-        for (i = 0; i < zaehler2; i++) {
+        for (i = 0; i < counter2; i++) {
           wn[i].ftnr = p16[i].ftnr;
           wn[i].freq = p16[i].freq;
           for (j = 0; j < n_img; j++)
@@ -286,7 +286,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
         /*end of candidate struct */
         /* ************************************************ */
-        for (kk = 0; kk < zaehler2; kk++) { /* zaehler2-loop */
+        for (kk = 0; kk < counter2; kk++) { /* counter2-loop */
 
           X4 = mega[3][wn[kk].ftnr].x[0];
           Y4 = mega[3][wn[kk].ftnr].x[1];
@@ -346,7 +346,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
               okay = 0;
             }
           }
-        } /* end of zaehler2-loop */
+        } /* end of counter2-loop */
         okay = 0;
 
         /* creating new particle position */
@@ -370,10 +370,10 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
            */
           xl[j] = xr[j] = yu[j] = yd[j] = 3.0;
           // stripped & from philf, ad holten 12-2012
-          zaehler2 =
+          counter2 =
               candsearch_in_pixrest(t4[3][j], nt4[3][j], xn[j], yn[j], xl[j],
                                     xr[j], yu[j], yd[j], philf[j]);
-          if (zaehler2 > 0) {
+          if (counter2 > 0) {
             x2[j] = t4[3][j][philf[j][0]].x;
             y2[j] = t4[3][j][philf[j][0]].y;
           }
@@ -505,7 +505,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
         }
         okay = 0;
         free(wn);
-      } /* end of zaehler1-loop */
+      } /* end of counter1-loop */
 
       /* ******************************************************************************/
       /* begin of inlist still zero */
@@ -539,10 +539,10 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
             xl[j] = xr[j] = yu[j] = yd[j] = 3.0;
 
             // stripped & from philf, ad holten 12-2012
-            zaehler2 =
+            counter2 =
                 candsearch_in_pixrest(t4[2][j], nt4[2][j], xn[j], yn[j], xl[j],
                                       xr[j], yu[j], yd[j], philf[j]);
-            if (zaehler2 > 0) {
+            if (counter2 > 0) {
               x2[j] = t4[2][j][philf[j][0]].x;
               y2[j] = t4[2][j][philf[j][0]].y;
             }
@@ -797,7 +797,7 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
                 const char **argv) {
   char buf[256];
   int i, j, h, k, step, okay = 0, invol = 0;
-  int zaehler1, philf[4][4];
+  int counter1, philf[4][4];
   int count1 = 0, count2 = 0, zusatz = 0;
   int quali = 0;
   double x2[4], y2[4], angle, acc, lmax, dl;
@@ -895,10 +895,10 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
           /* xl[j]/=5; xr[j]/=5; yu[j]/=5; yd[j]/=5; */ /* reduced search area
                                                          */
           // stripped & from philf, ad holten 12-2012
-          zaehler1 = candsearch_in_pix(t4[2][j], nt4[2][j], xn[j], yn[j], xl[j],
+          counter1 = candsearch_in_pix(t4[2][j], nt4[2][j], xn[j], yn[j], xl[j],
                                        xr[j], yu[j], yd[j], philf[j]);
           for (k = 0; k < 4; k++) {
-            if (zaehler1 > 0) {
+            if (counter1 > 0) {
               if (philf[j][k] == -999) {
                 p16[j * 4 + k].ftnr = -1;
               } else {
@@ -914,21 +914,21 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
         /* fill and sort candidate struct */
         // stripped & from p16, ad holten, 12-2012
-        sortwhatfound(p16, &zaehler1);
-        w = (foundpix *)calloc(zaehler1, sizeof(foundpix));
+        sortwhatfound(p16, &counter1);
+        w = (foundpix *)calloc(counter1, sizeof(foundpix));
 
         /*end of candidate struct */
-        if (zaehler1 > 0)
+        if (counter1 > 0)
           count2++;
-        for (i = 0; i < zaehler1; i++) {
+        for (i = 0; i < counter1; i++) {
           w[i].ftnr = p16[i].ftnr;
           w[i].freq = p16[i].freq;
           for (j = 0; j < n_img; j++)
             w[i].whichcam[j] = p16[i].whichcam[j];
         }
 
-        if (zaehler1 > 0)
-          for (i = 0; i < zaehler1; i++) {
+        if (counter1 > 0)
+          for (i = 0; i < counter1; i++) {
             X3 = mega[2][w[i].ftnr].x[0];
             Y3 = mega[2][w[i].ftnr].x[1];
             Z3 = mega[2][w[i].ftnr].x[2];
@@ -995,10 +995,10 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
                * searchquader */
               xl[j] = xr[j] = yu[j] = yd[j] = 3.0;
               // stripped & from philf, ad holten 12-2012
-              zaehler1 =
+              counter1 =
                   candsearch_in_pixrest(t4[2][j], nt4[2][j], xn[j], yn[j],
                                         xl[j], xr[j], yu[j], yd[j], philf[j]);
-              if (zaehler1 > 0) {
+              if (counter1 > 0) {
                 x2[j] = t4[2][j][philf[j][0]].x;
                 y2[j] = t4[2][j][philf[j][0]].y;
               }

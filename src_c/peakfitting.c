@@ -90,7 +90,7 @@ int peak_fit_new(Tcl_Interp *interp, unsigned char *img, char par_file[],
   /*------------------------------------------------------------------------*/
 
   label_img = (short *)calloc(imgsize, sizeof(short));
-  peaks = (peak *)malloc(4 * nmax * sizeof(peak));
+  peaks = (peak *)malloc(4 * NMAX * sizeof(peak));
   ptr_peak = peaks;
 
   /*------------------------------------------------------------------------*/

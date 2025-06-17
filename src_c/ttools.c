@@ -24,7 +24,7 @@ int pix_in_next(target next[], int num, double x, double y, double dl,
   /* search of POSI near candidates in targetlist */
 
   int j, j0, dj;
-  int zaehler = 0;
+  int counter = 0;
   double d, xmin, xmax, ymin, ymax;
   double dcand[POSI];
   int cand[POSI];
@@ -52,12 +52,12 @@ int pix_in_next(target next[], int num, double x, double y, double dl,
         next[j].y < ymax && next[j].tnr > 0) {
       d = sqrt((x - next[j].x) * (x - next[j].x) +
                (y - next[j].y) * (y - next[j].y));
-      cand[zaehler] = next[j].tnr;
-      dcand[zaehler] = d;
-      zaehler++;
+      cand[counter] = next[j].tnr;
+      dcand[counter] = d;
+      counter++;
     }
   }
-  return (zaehler);
+  return (counter);
 }
 #endif
 
@@ -66,7 +66,7 @@ int candsearch_in_pix(target next[], int num, double x, double y, double dl,
   /* search of four near candidates in targetlist */
 
   int j, j0, dj, pnr = -999;
-  int zaehler = 0, p1, p2, p3, p4;
+  int counter = 0, p1, p2, p3, p4;
   double d, dmin = 1e20, xmin, xmax, ymin, ymax;
   double d1, d2, d3, d4;
   xmin = x - dl;
@@ -157,11 +157,11 @@ int candsearch_in_pix(target next[], int num, double x, double y, double dl,
       p[3] = p4;
       for (j = 0; j < 4; j++)
         if (p[j] != -999) {
-          zaehler++;
+          counter++;
         }
     }
   }
-  return (zaehler);
+  return (counter);
 }
 
 int candsearch_in_pixrest(target next[], int num, double x, double y, double dl,
@@ -169,7 +169,7 @@ int candsearch_in_pixrest(target next[], int num, double x, double y, double dl,
   /* search of four near candidates in targetlist */
 
   int j, j0, dj;
-  int zaehler = 0, p1, p2, p3, p4;
+  int counter = 0, p1, p2, p3, p4;
   double d, dmin = 1e20, xmin, xmax, ymin, ymax;
   xmin = x - dl;
   xmax = x + dr;
@@ -230,9 +230,9 @@ int candsearch_in_pixrest(target next[], int num, double x, double y, double dl,
   p[3] = p4;
   for (j = 0; j < 4; j++)
     if (p[j] != -999) {
-      zaehler++;
+      counter++;
     }
-  return (zaehler);
+  return (counter);
 }
 
 void predict(double x1, double y1, double x2, double y2, double *x3,
@@ -375,7 +375,7 @@ void searchquader(double X, double Y, double Z, double xr[4], double xl[4],
   return;
 }
 
-void sortwhatfound(foundpix item[16], int *zaehler) {
+void sortwhatfound(foundpix item[16], int *counter) {
   int i, j, m, different;
   foundpix temp;
 
@@ -425,7 +425,7 @@ void sortwhatfound(foundpix item[16], int *zaehler) {
   for (i = 0; i < 16; ++i)
     if (item[i].freq != 0)
       different++;
-  *zaehler = different;
+  *counter = different;
 }
 
 void angle_acc(double X0, double Y0, double Z0, double X1, double Y1, double Z1,
