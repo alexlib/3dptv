@@ -352,7 +352,7 @@ void  predict (double x1, double y1, double x2, double y2, double *x3, double *y
 void  readseqtrackcrit ();
 void  searchquader(double X, double Y, double Z, 
 				  double xr[4], double xl[4], double yd[4], double yu[4]);
-void  sortwhatfound (foundpix item[16], int *zaehler);
+void  sortwhatfound (foundpix item[16], int *counter);
 void  angle_acc(double X0, double Y0, double Z0, double X1, double Y1, double Z1, \
 			   double X2, double Y2, double Z2, double *angle, double *acc);
 
