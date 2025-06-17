@@ -73,10 +73,10 @@ double db_scale;                           /*dumbbell length, Beat Mai 2010*/
 
 FILE *fp1, *fp2, *fp3, *fp4, *fpp;
 
-char img_name[4][512];    /* original image names */
+char img_name[4][500];    /* original image names */
 char img_lp_name[4][512]; /* lowpass image names */
 char img_hp_name[4][512]; /* highpass image names */
-char img_cal[4][512];     /* calibration image names */
+char img_cal[4][500];     /* calibration image names */
 char img_ori[4][512];     /* image orientation data */
 char img_ori0[4][512];    /* orientation approx. values */
 char img_addpar[4][512];  /* image additional parameters */
@@ -1389,7 +1389,7 @@ int calibration_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
       snprintf(img_addpar[i], sizeof(img_addpar[i]), "%s.addpar", img_name[i]);
       snprintf(img_hp_name[i], sizeof(img_hp_name[i]), "%s_hp", img_name[i]);
       snprintf(safety[i], sizeof(safety[i]), "safety_%d.ori", i);
-      snprintf(safety_addpar[i], sizeof(safety_addpar[i]), "safety_%d.addpa", i);
+      snprintf(safety_addpar[i], sizeof(safety_addpar[i]), "safety_%d.addpar", i);
     }
 
     for (i = 0; i < n_img; i++) {

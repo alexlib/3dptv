@@ -63,10 +63,10 @@ extern  double  db_scale; /*dumbbell length, Beat Mai 2010*/
 
 extern  FILE    *fp1, *fp2, *fp3, *fp4, *fpp;   /* file pointers */
 
-extern  char  img_name[4][512];                 /* original image names */
+extern  char  img_name[4][500];                 /* original image names */
 extern  char  img_lp_name[4][512];              /* lowpass image names */
 extern  char  img_hp_name[4][512];              /* highpass image names */
-extern  char  img_cal[4][512];                  /* calibration image names */
+extern  char  img_cal[4][500];                  /* calibration image names */
 extern  char  img_ori[4][512];                  /* image orientation data */
 extern  char  img_ori0[4][512];                 /* orientation approx. values */
 extern  char  img_addpar0[4][512];              /* approx. image additional parameters */
