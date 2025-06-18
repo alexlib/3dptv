@@ -26,7 +26,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
   char val[256], buf[256];
   int i, j, h, k, mm, kk, step, okay = 0, invol = 0;
   int counter1, counter2, philf[4][4];
-  int count1 = 0, count2 = 0, count3 = 0, lost = 0, zusatz = 0;
+  int count1 = 0, count2 = 0, count3 = 0, lost = 0, addpart = 0;
   int intx0, intx1, inty0, inty1;
   int intx2, inty2;
   int quali = 0;
@@ -42,7 +42,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
   foundpix *w, *wn, p16[16];
 
   display = atoi(argv[1]);
-  if (display) { // added, ad holten, 04-2013
+  if (display) {  // added, ad holten, 04-2013
     for (i = 0; i < n_img; i++)
       get_tclzoomparms(interp, &zoompar[i], i);
   }
@@ -56,10 +56,10 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
   /*Alloc space, if checkflag for mega, c4, t4 is zero */
   if (!trackallocflag) {
     for (i = 0; i < 4; i++) {
-      mega[i] = (P *)calloc(sizeof(P), M);
-      c4[i] = (corres *)calloc(sizeof(corres), M);
+      mega[i] = (P *)calloc(sizeof(P), M);  // NOLINT
+      c4[i] = (corres *)calloc(sizeof(corres), M);  // NOLINT
       for (k = 0; k < 4; k++) {
-        t4[i][k] = (target *)calloc(sizeof(target), M);
+        t4[i][k] = (target *)calloc(sizeof(target), M);  // NOLINT
       }
     }
     trackallocflag = 1;
@@ -82,7 +82,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
   /* sequence loop */
   for (step = seq_first; step < seq_last; step++) {
-    sprintf(buf, "Time step: %d, seqnr: %d, Particle info:", step - seq_first,
+    snprintf(buf, sizeof(buf), "Time step: %d, seqnr: %d, Particle info:", step - seq_first,
             step);
     Tcl_SetVar(interp, "tbuf", buf, TCL_GLOBAL_ONLY);
     Tcl_Eval(interp, ".text delete 2");
@@ -90,7 +90,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
     count1 = 0;
     lost = 0;
-    zusatz = 0;
+    addpart = 0;
 
     /* try to track correspondences from previous 0 - corp, variable h */
     for (h = 0; h < m[1]; h++) {
@@ -191,7 +191,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
       /* fill and sort candidate struct */
       // stripped & from p16, ad holten 12-2012
       sortwhatfound(p16, &counter1);
-      w = (foundpix *)calloc(counter1, sizeof(foundpix));
+      w = (foundpix *)calloc(counter1, sizeof(foundpix));  // NOLINT
 
       if (counter1 > 0)
         count2++;
@@ -205,8 +205,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
       /* ******************************************************* */
       /* check for what was found */
-      for (mm = 0; mm < counter1; mm++) /* counter1-loop */
-      {
+      for (mm = 0; mm < counter1; mm++) { /* counter1-loop */
         /* search for found corr of current the corr in next
            with predicted location */
 
@@ -251,7 +250,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
                                        xr[j], yu[j], yd[j], philf[j]);
 
           for (k = 0; k < 4; k++) {
-            // if( t4[3][j][philf[j][k]].tnr != -1)	//Beat 090325
+            // if( t4[3][j][philf[j][k]].tnr != -1)  //Beat 090325
             //{
             if (philf[j][k] == -999) {
               p16[j * 4 + k].ftnr = -1;
@@ -273,7 +272,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
         // stripped & from p16, ad holten 12-2012
         sortwhatfound(p16, &counter2);
-        wn = (foundpix *)calloc(counter2, sizeof(foundpix));
+        wn = (foundpix *)calloc(counter2, sizeof(foundpix));  // NOLINT
         if (counter2 > 0)
           count3++;
 
@@ -334,7 +333,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
                   (acc < tpar.dacc / 10)) {
                 rr = (dl / lmax + acc / tpar.dacc + angle / tpar.dangle) /
                      (quali);
-                mega[1][h].decis[mega[1][h].inlist] = (float)rr;
+                mega[1][h].decis[mega[1][h].inlist] = (float)rr;  // NOLINT
                 mega[1][h].linkdecis[mega[1][h].inlist] = w[mm].ftnr;
                 mega[1][h].inlist++;
                 /*
@@ -389,7 +388,6 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
         }
 
         if (quali >= 2) {
-
           X4 = X5;
           Y4 = Y5;
           Z4 = Z5;
@@ -433,14 +431,14 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
                    X4, Y4, Z4, dl, acc, angle, quali+w[mm].freq, rr);
                 */
 
-                mega[1][h].decis[mega[1][h].inlist] = (float)rr;
+                mega[1][h].decis[mega[1][h].inlist] = (float)rr;  // NOLINT
                 mega[1][h].linkdecis[mega[1][h].inlist] = w[mm].ftnr;
                 mega[1][h].inlist++;
 
                 if (tpar.add) {
-                  mega[3][m[3]].x[0] = (float)X4;
-                  mega[3][m[3]].x[1] = (float)Y4;
-                  mega[3][m[3]].x[2] = (float)Z4;
+                  mega[3][m[3]].x[0] = (float)X4;  // NOLINT
+                  mega[3][m[3]].x[1] = (float)Y4;  // NOLINT
+                  mega[3][m[3]].x[2] = (float)Z4;  // NOLINT
                   mega[3][m[3]].prev = -1;
                   mega[3][m[3]].next = -2;
                   mega[3][m[3]].prio = 2;
@@ -454,7 +452,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
                     }
                   }
                   m[3]++;
-                  zusatz++;
+                  addpart++;
                 }
               }
             }
@@ -491,7 +489,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
                   (acc < tpar.dacc / 10)) {
                 rr = (dl / lmax + acc / tpar.dacc + angle / tpar.dangle) /
                      (quali);
-                mega[1][h].decis[mega[1][h].inlist] = (float)rr;
+                mega[1][h].decis[mega[1][h].inlist] = (float)rr;  // NOLINT
                 mega[1][h].linkdecis[mega[1][h].inlist] = w[mm].ftnr;
                 mega[1][h].inlist++;
                 /*
@@ -616,7 +614,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
                     }
                   }
                   m[2]++;
-                  zusatz++;
+                  addpart++;
                 }
               }
               okay = 0;
@@ -751,7 +749,7 @@ int trackcorr_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
     /* ******** End of Draw links now ******** */
     sprintf(buf, "step: %d, curr: %d, next: %d, links: %d, lost: %d, add: %d",
-            step, m[1], m[2], count1, m[1] - count1, zusatz);
+            step, m[1], m[2], count1, m[1] - count1, addpart);
 
     /* for the average of particles and links */
     npart = npart + m[1];
@@ -798,7 +796,7 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
   char buf[256];
   int i, j, h, k, step, okay = 0, invol = 0;
   int counter1, philf[4][4];
-  int count1 = 0, count2 = 0, zusatz = 0;
+  int count1 = 0, count2 = 0, addpart = 0;
   int quali = 0;
   double x2[4], y2[4], angle, acc, lmax, dl;
   double xr[4], xl[4], yd[4], yu[4];
@@ -1095,7 +1093,7 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
 
     /* create links with decision check */
     count1 = 0;
-    zusatz = 0;
+    addpart = 0;
     for (h = 0; h < m[1]; h++) {
       if (mega[1][h].inlist > 0) {
         /* if old/new and unused prev == -1 and next == -2 link is created */
@@ -1104,7 +1102,7 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
           mega[1][h].finaldecis = mega[1][h].decis[0];
           mega[1][h].prev = mega[1][h].linkdecis[0];
           mega[2][mega[1][h].prev].next = h;
-          zusatz++;
+          addpart++;
         }
 
         /* old which link to prev has to be checked */
@@ -1147,7 +1145,7 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
             mega[1][h].finaldecis = mega[1][h].decis[0];
             mega[1][h].prev = mega[1][h].linkdecis[0];
             mega[2][mega[1][h].prev].next = h;
-            zusatz++;
+            addpart++;
           }
         }
       }
@@ -1156,7 +1154,7 @@ int trackback_c(ClientData clientData, Tcl_Interp *interp, int argc,
     } /* end of creation of links with decision check */
 
     sprintf(buf, "step: %d, curr: %d, next: %d, links: %d, lost: %d, add: %d",
-            step, m[1], m[2], count1, m[1] - count1, zusatz);
+            step, m[1], m[2], count1, m[1] - count1, addpart);
 
     /* for the average of particles and links */
     npart = npart + m[1];
