@@ -67,6 +67,7 @@ int seq_track_proc_c(ClientData clientData, Tcl_Interp *interp, int argc,
   read_ascii_data(step + 2);
 
   for (step = (seq_first + 2); step < seq_last; step++) {
+    printf("Processing step: %d\n", step);
     tracking(clientData, interp, argc, argv);
     rotate_dataset();
     write_ascii_data(step - 2);
@@ -940,6 +941,24 @@ void level3(void) {
     } while (finish);
   } /*if(inlist >0)*/
     /*END OF THIRD TRAIL*/
+    // printf("Tracking results for current step:\n");
+    // for (int i = 0; i < m[1]; i++) {
+    //   printf("Particle %d: prev=%d next=%d prio=%d finaldecis=%.3f pos=(%.3f, %.3f, %.3f)\n",
+    //        i, mega[1][i].prev, mega[1][i].next, mega[1][i].prio, mega[1][i].finaldecis,
+    //        mega[1][i].x[0], mega[1][i].x[1], mega[1][i].x[2]);
+    // }
+    int n_continue = 0, n_stopped = 0, n_new = 0;
+    for (int i = 0; i < m[1]; i++) {
+      if (mega[1][i].prev >= 0 && mega[1][i].next >= 0) {
+        n_continue++;
+      } else if (mega[1][i].prev >= 0 && mega[1][i].next < 0) {
+        n_stopped++;
+      } else if (mega[1][i].prev < 0 && mega[1][i].next >= 0) {
+        n_new++;
+      }
+    }
+    printf("Summary for current step: continued=%d, stopped=%d, new=%d\n",
+           n_continue, n_stopped, n_new);
 }
 
 /***SORTING ALGORIHTMUS****/
