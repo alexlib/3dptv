@@ -38,7 +38,17 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the entrypoint
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "\
+  WORK_DIR=\"${1:-/opt/3dptv/test}\" && \
+  if [ ! -d \"$WORK_DIR\" ]; then \
+    echo \"Error: Specified working directory '$WORK_DIR' does not exist inside the container.\"; \
+    echo \"Please ensure the directory is correctly mounted and the path is valid.\"; \
+    exit 1; \
+  fi && \
+  cd \"$WORK_DIR\" && \
+  [ -d res ] || mkdir res && \
+  exec /opt/3dptv/build/bin/3dptv /opt/3dptv/ptv.tcl \
+", "--"]
 
 # Default command can be an empty array or a default path for the entrypoint
 # The entrypoint.sh script already defines a default working directory if none is provided.
