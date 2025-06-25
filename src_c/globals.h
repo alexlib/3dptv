@@ -18,7 +18,7 @@ typedef bool BOOL;   // Typedef BOOL from the standard bool
 #define NMAX 20240
 #define MAX_IMAGES 4
 #define MAX_TARGETS 20000  // Max number of targets per image
-#define MAX_CANDIDATES 100
+// #define MAX_CANDIDATES 100
 
 // zooming
 enum MARKTYPES  {OBJ_MARK, OBJ_CROSS, OBJ_VECTOR, OBJ_PNR, OBJ_VALUE, OBJ_OVAL};
@@ -78,27 +78,27 @@ extern  char  res_name[512];                    /* result destination */
 extern  char  par_name[512];
 extern  char  base_name[512];
 
-extern char	cal_img_base_name[4][512];
-extern char	tiff_img_name[4][512];
-extern char	target_name[4][512];
-extern char	linkage_name[4][512];
-extern char	prio_name[512];
-extern char	added_name[512];
-extern char	cal_db_name[512];
-extern char	cor_name[512];
-extern char	seq_log_name[512];
-extern char	track_log_name[512];
-extern char	traj_name[512];
-extern char	rtf_name[512];
-extern char	sum_name[512];
-extern char	connect_name[512];
+extern char  cal_img_base_name[4][512];
+extern char  tiff_img_name[4][512];
+extern char  target_name[4][512];
+extern char  linkage_name[4][512];
+extern char  prio_name[512];
+extern char  added_name[512];
+extern char  cal_db_name[512];
+extern char  cor_name[512];
+extern char  seq_log_name[512];
+extern char  track_log_name[512];
+extern char  traj_name[512];
+extern char  rtf_name[512];
+extern char  sum_name[512];
+extern char  connect_name[512];
 
 #define MAX_PLANES 10  // Define MAX_PLANES with an appropriate value
 
 extern char multi_filename[MAX_PLANES][512];
 extern char filename_in[10][512];
-extern char	filename_out[512];
-extern char	textline[512];
+extern char filename_out[512];
+extern char textline[512];
 
 extern  unsigned char *img[];                   /* image data */
 extern  unsigned char *zoomimg;                 /* zomm image data */
