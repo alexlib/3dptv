@@ -7,22 +7,11 @@
         {
             "name": "(gdb) Launch 3dptv in test/",
             "type": "cppdbg",
+            "miDebuggerPath": "/usr/bin/gdb",
             "request": "launch",
             "program": "${workspaceFolder}/build/bin/3dptv",
             "args": ["${workspaceFolder}/ptv.tcl"],
-            "stopAtEntry": false,
-            // "cwd": "${workspaceFolder}/test",
-            "cwd": "${workspaceFolder}/70/",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
+            "cwd": "${workspaceFolder}/test/",
             "preLaunchTask": "CMake: build" // Optional: ensures project is built before debugging
         }
     ]

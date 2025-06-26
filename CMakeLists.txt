@@ -1,5 +1,4 @@
-# Main CMakeLists file
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 project (3dptv_solution)
 
@@ -17,7 +16,11 @@ else()
 endif()
 
 # Find TCL/TK
-find_package( TCL REQUIRED 8.6)
+set(TCL_INCLUDE_PATH "/usr/include/tcl8.6")
+set(TCL_LIBRARY "/usr/lib/x86_64-linux-gnu/libtcl.so")
+set(TK_INCLUDE_PATH "/usr/include/tcl8.6")
+set(TK_LIBRARY "/usr/lib/x86_64-linux-gnu/libtk8.6.so")
+find_package(TCL 8.6 REQUIRED)
 
 if (TCLTK_FOUND )
 	message(STATUS "TCL INCLUDE: " ${TCL_INCLUDE_PATH})
