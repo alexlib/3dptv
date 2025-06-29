@@ -34,7 +34,7 @@ This guide explains how to use Docker to create a consistent Linux environment f
 
         ```bash
         docker run -it --rm ^
-            -v "C:\\path\\to\\your\\data\\directory:/data" ^
+            -v "C:\\Users\\Alex\\Downloads\\Github\\3dptv\test:/data" ^
             -e DISPLAY=host.docker.internal:0.0 ^
             3dptv-app /data
         ```
